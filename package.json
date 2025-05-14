@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "scripts": {
+    "build": "rollup --config './src/rollup.config.js'",
+    "example": "npm run build && jco transpile --async-mode jspi --no-nodejs-compat ./examples/$npm_config_example.wasm -o ./examples/static --async-exports 'run' --async-imports 'wasi:webgpu/webgpu#[method]gpu.request-adapter' --async-imports 'wasi:webgpu/webgpu#[method]gpu-adapter.request-device' --async-wasi-imports --async-wasi-exports --map 'wasi:filesystem/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/filesystem.js#*' --map 'wasi:clocks/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/clocks.js#*' --map 'wasi:io/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/io.js#*' --map 'wasi:random/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/random.js#*' --map 'wasi:cli/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/cli.js#*' --map 'wasi:sockets/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/sockets.js#*' --map 'wasi:cli/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/cli.js#*' --map 'wasi:io/poll=./gfx.js#poll' --map 'wasi:webgpu/webgpu=./gfx.js' --map 'wasi:surface/surface=./gfx.js' --map 'wasi:graphics-context/graphics-context=./gfx.js' --map 'wasi:frame-buffer/frame-buffer=./gfx.js' && cp src/gfx.js examples/static/gfx.js"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@webgpu/types": "^0.1.52",
+    "rollup": "^4.40.2",
+    "tslib": "^2.8.1"
+  }
+}
