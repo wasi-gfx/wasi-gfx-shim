@@ -27,9 +27,6 @@ export class Pollable {
 	}
 }
 
-// @ts-ignore
-window.Pollable = Pollable;
-
 export const poll = {
 	poll: async (inList: Pollable[]) => {
 		let finished: number[] = [];
