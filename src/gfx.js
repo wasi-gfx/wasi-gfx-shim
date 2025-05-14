@@ -25,8 +25,6 @@ class Pollable {
         }
     }
 }
-// @ts-ignore
-window.Pollable = Pollable;
 const poll = {
     poll: async (inList) => {
         let finished = [];
