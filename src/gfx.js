@@ -45,6 +45,353 @@ class Unreachable extends Error {
     }
 }
 
+function keyWebToWasi(key) {
+    switch (key) {
+        case "Backquote":
+            return "backquote";
+        case "Backslash":
+            return "backslash";
+        case "BracketLeft":
+            return "bracket-left";
+        case "BracketRight":
+            return "bracket-right";
+        case "Comma":
+            return "comma";
+        case "Digit0":
+            return "digit0";
+        case "Digit1":
+            return "digit1";
+        case "Digit2":
+            return "digit2";
+        case "Digit3":
+            return "digit3";
+        case "Digit4":
+            return "digit4";
+        case "Digit5":
+            return "digit5";
+        case "Digit6":
+            return "digit6";
+        case "Digit7":
+            return "digit7";
+        case "Digit8":
+            return "digit8";
+        case "Digit9":
+            return "digit9";
+        case "Equal":
+            return "equal";
+        case "IntlBackslash":
+            return "intl-backslash";
+        case "IntlRo":
+            return "intl-ro";
+        case "IntlYen":
+            return "intl-yen";
+        case "KeyA":
+            return "key-a";
+        case "KeyB":
+            return "key-b";
+        case "KeyC":
+            return "key-c";
+        case "KeyD":
+            return "key-d";
+        case "KeyE":
+            return "key-e";
+        case "KeyF":
+            return "key-f";
+        case "KeyG":
+            return "key-g";
+        case "KeyH":
+            return "key-h";
+        case "KeyI":
+            return "key-i";
+        case "KeyJ":
+            return "key-j";
+        case "KeyK":
+            return "key-k";
+        case "KeyL":
+            return "key-l";
+        case "KeyM":
+            return "key-m";
+        case "KeyN":
+            return "key-n";
+        case "KeyO":
+            return "key-o";
+        case "KeyP":
+            return "key-p";
+        case "KeyQ":
+            return "key-q";
+        case "KeyR":
+            return "key-r";
+        case "KeyS":
+            return "key-s";
+        case "KeyT":
+            return "key-t";
+        case "KeyU":
+            return "key-u";
+        case "KeyV":
+            return "key-v";
+        case "KeyW":
+            return "key-w";
+        case "KeyX":
+            return "key-x";
+        case "KeyY":
+            return "key-y";
+        case "KeyZ":
+            return "key-z";
+        case "Minus":
+            return "minus";
+        case "Period":
+            return "period";
+        case "Quote":
+            return "quote";
+        case "Semicolon":
+            return "semicolon";
+        case "Slash":
+            return "slash";
+        case "AltLeft":
+            return "alt-left";
+        case "AltRight":
+            return "alt-right";
+        case "Backspace":
+            return "backspace";
+        case "CapsLock":
+            return "caps-lock";
+        case "ContextMenu":
+            return "context-menu";
+        case "ControlLeft":
+            return "control-left";
+        case "ControlRight":
+            return "control-right";
+        case "Enter":
+            return "enter";
+        case "MetaLeft":
+            return "meta-left";
+        case "MetaRight":
+            return "meta-right";
+        case "ShiftLeft":
+            return "shift-left";
+        case "ShiftRight":
+            return "shift-right";
+        case "Space":
+            return "space";
+        case "Tab":
+            return "tab";
+        case "Convert":
+            return "convert";
+        case "KanaMode":
+            return "kana-mode";
+        case "Lang1":
+            return "lang1";
+        case "Lang2":
+            return "lang2";
+        case "Lang3":
+            return "lang3";
+        case "Lang4":
+            return "lang4";
+        case "Lang5":
+            return "lang5";
+        case "NonConvert":
+            return "non-convert";
+        case "Delete":
+            return "delete";
+        case "End":
+            return "end";
+        case "Help":
+            return "help";
+        case "Home":
+            return "home";
+        case "Insert":
+            return "insert";
+        case "PageDown":
+            return "page-down";
+        case "PageUp":
+            return "page-up";
+        case "ArrowDown":
+            return "arrow-down";
+        case "ArrowLeft":
+            return "arrow-left";
+        case "ArrowRight":
+            return "arrow-right";
+        case "ArrowUp":
+            return "arrow-up";
+        case "NumLock":
+            return "num-lock";
+        case "Numpad0":
+            return "numpad0";
+        case "Numpad1":
+            return "numpad1";
+        case "Numpad2":
+            return "numpad2";
+        case "Numpad3":
+            return "numpad3";
+        case "Numpad4":
+            return "numpad4";
+        case "Numpad5":
+            return "numpad5";
+        case "Numpad6":
+            return "numpad6";
+        case "Numpad7":
+            return "numpad7";
+        case "Numpad8":
+            return "numpad8";
+        case "Numpad9":
+            return "numpad9";
+        case "NumpadAdd":
+            return "numpad-add";
+        case "NumpadBackspace":
+            return "numpad-backspace";
+        case "NumpadClear":
+            return "numpad-clear";
+        case "NumpadClearEntry":
+            return "numpad-clear-entry";
+        case "NumpadComma":
+            return "numpad-comma";
+        case "NumpadDecimal":
+            return "numpad-decimal";
+        case "NumpadDivide":
+            return "numpad-divide";
+        case "NumpadEnter":
+            return "numpad-enter";
+        case "NumpadEqual":
+            return "numpad-equal";
+        case "NumpadHash":
+            return "numpad-hash";
+        case "NumpadMemoryAdd":
+            return "numpad-memory-add";
+        case "NumpadMemoryClear":
+            return "numpad-memory-clear";
+        case "NumpadMemoryRecall":
+            return "numpad-memory-recall";
+        case "NumpadMemoryStore":
+            return "numpad-memory-store";
+        case "NumpadMemorySubtract":
+            return "numpad-memory-subtract";
+        case "NumpadMultiply":
+            return "numpad-multiply";
+        case "NumpadParenLeft":
+            return "numpad-paren-left";
+        case "NumpadParenRight":
+            return "numpad-paren-right";
+        case "NumpadStar":
+            return "numpad-star";
+        case "Escape":
+            return "escape";
+        case "F1":
+            return "f1";
+        case "F2":
+            return "f2";
+        case "F3":
+            return "f3";
+        case "F4":
+            return "f4";
+        case "F5":
+            return "f5";
+        case "F6":
+            return "f6";
+        case "F7":
+            return "f7";
+        case "F8":
+            return "f8";
+        case "F9":
+            return "f9";
+        case "F10":
+            return "f10";
+        case "F11":
+            return "f11";
+        case "F12":
+            return "f12";
+        case "Fn":
+            return "fn";
+        case "FnLock":
+            return "fn-lock";
+        case "PrintScreen":
+            return "print-screen";
+        case "ScrollLock":
+            return "scroll-lock";
+        case "Pause":
+            return "pause";
+        case "BrowserBack":
+            return "browser-back";
+        case "BrowserFavorites":
+            return "browser-favorites";
+        case "BrowserForward":
+            return "browser-forward";
+        case "BrowserHome":
+            return "browser-home";
+        case "BrowserRefresh":
+            return "browser-refresh";
+        case "BrowserSearch":
+            return "browser-search";
+        case "BrowserStop":
+            return "browser-stop";
+        case "Eject":
+            return "eject";
+        case "LaunchApp1":
+            return "launch-app1";
+        case "LaunchApp2":
+            return "launch-app2";
+        case "LaunchMail":
+            return "launch-mail";
+        case "MediaPlayPause":
+            return "media-play-pause";
+        case "MediaSelect":
+            return "media-select";
+        case "MediaStop":
+            return "media-stop";
+        case "MediaTrackNext":
+            return "media-track-next";
+        case "MediaTrackPrevious":
+            return "media-track-previous";
+        case "Power":
+            return "power";
+        case "Sleep":
+            return "sleep";
+        case "AudioVolumeDown":
+            return "audio-volume-down";
+        case "AudioVolumeMute":
+            return "audio-volume-mute";
+        case "AudioVolumeUp":
+            return "audio-volume-up";
+        case "WakeUp":
+            return "wake-up";
+        case "Hyper":
+            return "hyper";
+        case "Super":
+            return "super";
+        case "Turbo":
+            return "turbo";
+        case "Abort":
+            return "abort";
+        case "Resume":
+            return "resume";
+        case "Suspend":
+            return "suspend";
+        case "Again":
+            return "again";
+        case "Copy":
+            return "copy";
+        case "Cut":
+            return "cut";
+        case "Find":
+            return "find";
+        case "Open":
+            return "open";
+        case "Paste":
+            return "paste";
+        case "Props":
+            return "props";
+        case "Select":
+            return "select";
+        case "Undo":
+            return "undo";
+        case "Hiragana":
+            return "hiragana";
+        case "Katakana":
+            return "katakana";
+        case "Unidentified":
+        default:
+            return undefined;
+    }
+}
 class Surface {
     canvas;
     pointerUpEvent;
@@ -58,6 +405,7 @@ class Surface {
         this.canvas = document.createElement('canvas');
         this.canvas.style.width = '100svw';
         this.canvas.style.height = '100svh';
+        this.canvas.tabIndex = 0;
         Promise.resolve().then(() => {
             const styles = getComputedStyle(this.canvas);
             this.canvas.width = parseInt(styles.getPropertyValue('width'));
@@ -72,11 +420,11 @@ class Surface {
         // TODO: not sure this is correct
         const pollable = new Pollable();
         new ResizeObserver(entries => {
-            for (const entry of entries) {
-                if (entry.contentBoxSize) {
-                    pollable.resolve();
-                }
-            }
+            this.resizeEvent = {
+                width: entries[0].contentBoxSize[0].inlineSize,
+                height: entries[0].contentBoxSize[0].blockSize,
+            };
+            pollable.resolve();
         }).observe(this.canvas);
         return pollable;
     }
@@ -153,37 +501,42 @@ class Surface {
     subscribeKeyUp() {
         const pollable = new Pollable();
         this.canvas.addEventListener('keyup', event => {
-            throw new Todo;
+            this.keyUpEvent = {
+                key: keyWebToWasi(event.key),
+                text: event.key,
+                altKey: event.altKey,
+                ctrlKey: event.ctrlKey,
+                metaKey: event.metaKey,
+                shiftKey: event.shiftKey,
+            };
+            pollable.resolve();
         });
         return pollable;
     }
     getKeyUp() {
-        throw new Todo;
+        const event = this.keyUpEvent;
+        this.keyUpEvent = undefined;
+        return event;
     }
     subscribeKeyDown() {
         const pollable = new Pollable();
         this.canvas.addEventListener('keydown', event => {
-            throw new Todo;
+            this.keyDownEvent = {
+                key: keyWebToWasi(event.key),
+                text: event.key,
+                altKey: event.altKey,
+                ctrlKey: event.ctrlKey,
+                metaKey: event.metaKey,
+                shiftKey: event.shiftKey,
+            };
+            pollable.resolve();
         });
         return pollable;
     }
     getKeyDown() {
-        throw new Todo;
-    }
-    handlePointerUp(event) {
-        throw new Todo;
-    }
-    handlePointerDown(event) {
-        throw new Todo;
-    }
-    handlePointerMove(event) {
-        throw new Todo;
-    }
-    handleKeyUp(event) {
-        throw new Todo;
-    }
-    handleKeyDown(event) {
-        throw new Todo;
+        const event = this.keyDownEvent;
+        this.keyDownEvent = undefined;
+        return event;
     }
     getContext(contextId, options) {
         return this.canvas.getContext(contextId, options);
@@ -372,12 +725,22 @@ function convertVertexFormatWasiToWeb(name) {
             return name;
     }
 }
+function convertTextureDimensionWasiToWeb(name) {
+    switch (name) {
+        case "d1":
+            return "1d";
+        case "d2":
+            return "2d";
+        case "d3":
+            return "3d";
+    }
+}
 function convertTextureViewDimensionWasiToWeb(name) {
     switch (name) {
         case "d1":
             return "1d";
         case "d2":
-            return "3d";
+            return "2d";
         case "d3":
             return "3d";
         case "d2-array":
@@ -393,6 +756,12 @@ function convertGpuLayoutWasiToWeb(layout) {
         case 'auto':
             return 'auto';
     }
+}
+function bigIntToNumber(bigInt) {
+    return Number(bigInt);
+}
+function numberToBigInt(number) {
+    return BigInt(number);
 }
 const inner = Symbol("inner");
 const key = Symbol("key");
@@ -426,13 +795,13 @@ class GpuAdapter {
         this[inner] = i;
     }
     features() {
-        throw new Todo;
+        return new GpuSupportedFeatures(key, this[inner].features);
     }
     limits() {
-        throw new Todo;
+        return new GpuSupportedLimits(key, this[inner].limits);
     }
     info() {
-        throw new Todo;
+        return new GpuAdapterInfo(key, this[inner].info);
     }
     isFallbackAdapter() {
         throw new Todo;
@@ -471,13 +840,13 @@ class GpuDevice {
         return new AbstractBuffer(this.#context.getCurrentTexture());
     }
     features() {
-        throw new Todo;
+        return new GpuSupportedFeatures(key, this[inner].features);
     }
     limits() {
-        throw new Todo;
+        return new GpuSupportedLimits(key, this[inner].limits);
     }
     adapterInfo() {
-        throw new Todo;
+        return new GpuAdapterInfo(key, this[inner].adapterInfo);
     }
     queue() {
         return new GpuQueue(key, this[inner].queue);
@@ -486,16 +855,86 @@ class GpuDevice {
         throw new Todo;
     }
     createBuffer(descriptor) {
-        throw new Todo;
+        return new GpuBuffer(key, this[inner].createBuffer({
+            ...descriptor,
+            size: bigIntToNumber(descriptor.size),
+        }));
     }
     createTexture(descriptor) {
-        throw new Todo;
+        let dimension;
+        if (descriptor.dimension) {
+            dimension = convertTextureDimensionWasiToWeb(descriptor.dimension);
+        }
+        if (descriptor.format) {
+            convertTextureFormatWasiToWeb(descriptor.format);
+        }
+        let viewFormats;
+        if (descriptor.viewFormats) {
+            viewFormats = descriptor.viewFormats.map(convertTextureFormatWasiToWeb);
+        }
+        return new GpuTexture(key, this[inner].createTexture({
+            ...descriptor,
+            dimension,
+            format: convertTextureFormatWasiToWeb(descriptor.format),
+            viewFormats,
+        }));
     }
     createSampler(descriptor) {
-        throw new Todo;
+        return new GpuSampler(key, this[inner].createSampler(descriptor));
     }
     createBindGroupLayout(descriptor) {
-        throw new Todo;
+        return new GpuBindGroupLayout(key, this[inner].createBindGroupLayout({
+            ...descriptor,
+            entries: descriptor.entries.map(entry => {
+                let buffer;
+                if (entry.buffer) {
+                    let minBindingSize;
+                    if (entry.buffer.minBindingSize) {
+                        minBindingSize = bigIntToNumber(entry.buffer.minBindingSize);
+                    }
+                    buffer = {
+                        ...entry.buffer,
+                        minBindingSize,
+                    };
+                }
+                let sampler;
+                if (entry.sampler) {
+                    sampler = {
+                        ...entry.sampler,
+                    };
+                }
+                let texture;
+                if (entry.texture) {
+                    let viewDimension;
+                    if (entry.texture.viewDimension) {
+                        viewDimension = convertTextureViewDimensionWasiToWeb(entry.texture.viewDimension);
+                    }
+                    texture = {
+                        ...entry.texture,
+                        viewDimension,
+                    };
+                }
+                let storageTexture;
+                if (entry.storageTexture) {
+                    let viewDimension;
+                    if (entry.storageTexture.viewDimension) {
+                        viewDimension = convertTextureViewDimensionWasiToWeb(entry.storageTexture.viewDimension);
+                    }
+                    storageTexture = {
+                        ...entry.storageTexture,
+                        format: convertTextureFormatWasiToWeb(entry.storageTexture.format),
+                        viewDimension,
+                    };
+                }
+                return {
+                    ...entry,
+                    buffer,
+                    sampler,
+                    texture,
+                    storageTexture,
+                };
+            }),
+        }));
     }
     createPipelineLayout(descriptor) {
         return new GpuPipelineLayout(key, this[inner].createPipelineLayout({
@@ -508,7 +947,43 @@ class GpuDevice {
         }));
     }
     createBindGroup(descriptor) {
-        throw new Todo;
+        return new GpuBindGroup(key, this[inner].createBindGroup({
+            ...descriptor,
+            layout: descriptor.layout[inner],
+            entries: descriptor.entries.map(entry => {
+                let resource;
+                switch (entry.resource.tag) {
+                    case 'gpu-buffer-binding':
+                        let offset;
+                        if (entry.resource.val.offset) {
+                            offset = bigIntToNumber(entry.resource.val.offset);
+                        }
+                        let size;
+                        if (entry.resource.val.size) {
+                            size = bigIntToNumber(entry.resource.val.size);
+                        }
+                        resource = {
+                            ...entry.resource.val,
+                            buffer: entry.resource.val.buffer[inner],
+                            offset,
+                            size,
+                        };
+                        break;
+                    case 'gpu-sampler':
+                        resource = entry.resource.val[inner];
+                        break;
+                    case 'gpu-texture-view':
+                        resource = entry.resource.val[inner];
+                        break;
+                    default:
+                        throw new Unreachable;
+                }
+                return {
+                    ...entry,
+                    resource,
+                };
+            }),
+        }));
     }
     createShaderModule(descriptor) {
         let compilationHints;
@@ -539,11 +1014,11 @@ class GpuDevice {
                 if (vbl) {
                     return {
                         ...vbl,
-                        arrayStride: Number(vbl.arrayStride),
+                        arrayStride: bigIntToNumber(vbl.arrayStride),
                         attributes: Array.from(vbl.attributes).map(attribute => {
                             return {
                                 ...attribute,
-                                offset: Number(attribute.offset),
+                                offset: bigIntToNumber(attribute.offset),
                                 format: convertVertexFormatWasiToWeb(attribute.format),
                             };
                         }),
@@ -628,6 +1103,11 @@ class GpuDevice {
     }
 }
 class GpuAdapterInfo {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     vendor() {
         throw new Todo;
     }
@@ -648,6 +1128,11 @@ class GpuAdapterInfo {
     }
 }
 class GpuBindGroup {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
 }
 class GpuBindGroupLayout {
     [inner];
@@ -657,29 +1142,60 @@ class GpuBindGroupLayout {
     }
 }
 class GpuBuffer {
+    [inner];
+    #mappedRange;
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     size() {
-        throw new Todo;
+        return numberToBigInt(this[inner].size);
     }
     usage() {
-        throw new Todo;
+        return this[inner].usage;
     }
     mapState() {
-        throw new Todo;
+        return this[inner].mapState;
     }
     mapAsync(mode, offset, size) {
         throw new Todo;
     }
     getMappedRangeGetWithCopy(offset, size) {
-        throw new Todo;
+        // TODO: letting getMappedRange be called multiple times until we figure out how to avoid the with-copy behavior
+        let offsetNumber;
+        if (offset) {
+            offsetNumber = bigIntToNumber(offset);
+        }
+        let sizeNumber;
+        if (size) {
+            sizeNumber = bigIntToNumber(size);
+        }
+        if (!this.#mappedRange) {
+            this.#mappedRange = new Uint8Array(this[inner].getMappedRange(offsetNumber, sizeNumber));
+        }
+        return this.#mappedRange;
     }
     unmap() {
-        throw new Todo;
+        this.#mappedRange = undefined;
+        this[inner].unmap();
     }
     destroy() {
         throw new Todo;
     }
     getMappedRangeSetWithCopy(data, offset, size) {
-        throw new Todo;
+        // TODO: letting getMappedRange be called multiple times until we figure out how to avoid the with-copy behavior
+        let offsetNumber;
+        if (offset) {
+            offsetNumber = bigIntToNumber(offset);
+        }
+        let sizeNumber;
+        if (size) {
+            sizeNumber = bigIntToNumber(size);
+        }
+        if (!this.#mappedRange) {
+            this.#mappedRange = new Uint8Array(this[inner].getMappedRange(offsetNumber, sizeNumber));
+        }
+        this.#mappedRange.set(data);
     }
 }
 class GpuBufferUsage {
@@ -759,11 +1275,11 @@ class GpuCommandEncoder {
         this[inner] = i;
     }
     beginRenderPass(descriptor) {
-        let colorAttachments = Array.from(descriptor.colorAttachments).map(colorAttachment => {
-            let resolveTarget;
-            if (colorAttachment?.resolveTarget)
-                resolveTarget = colorAttachment.resolveTarget[inner];
+        let colorAttachments = descriptor.colorAttachments.map(colorAttachment => {
             if (colorAttachment) {
+                let resolveTarget;
+                if (colorAttachment?.resolveTarget)
+                    resolveTarget = colorAttachment.resolveTarget[inner];
                 return {
                     ...colorAttachment,
                     view: colorAttachment.view[inner],
@@ -774,8 +1290,35 @@ class GpuCommandEncoder {
                 return undefined;
             }
         });
+        let occlusionQuerySet;
+        if (descriptor?.occlusionQuerySet) {
+            occlusionQuerySet = descriptor.occlusionQuerySet[inner];
+        }
+        let timestampWrites;
+        if (descriptor?.timestampWrites) {
+            timestampWrites = {
+                ...descriptor.timestampWrites,
+                querySet: descriptor.timestampWrites.querySet[inner],
+            };
+        }
+        let depthStencilAttachment;
+        if (descriptor?.depthStencilAttachment) {
+            depthStencilAttachment = {
+                ...descriptor.depthStencilAttachment,
+                view: descriptor.depthStencilAttachment.view[inner],
+            };
+        }
+        let maxDrawCount;
+        if (descriptor?.maxDrawCount) {
+            maxDrawCount = bigIntToNumber(descriptor.maxDrawCount);
+        }
         return new GpuRenderPassEncoder(key, this[inner].beginRenderPass({
-            colorAttachments
+            ...descriptor,
+            colorAttachments,
+            depthStencilAttachment,
+            occlusionQuerySet,
+            timestampWrites,
+            maxDrawCount,
         }));
     }
     beginComputePass(descriptor) {
@@ -813,6 +1356,12 @@ class GpuCommandEncoder {
     insertDebugMarker(markerLabel) {
         throw new Todo;
     }
+    label() {
+        return this[inner].label;
+    }
+    setLabel(label) {
+        this[inner].label = label;
+    }
 }
 class GpuCompilationInfo {
     messages() { throw new Todo; }
@@ -838,6 +1387,11 @@ class GpuCompilationMessage {
     }
 }
 class GpuComputePassEncoder {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     setPipeline(pipeline) {
         throw new Todo;
     }
@@ -864,6 +1418,11 @@ class GpuComputePassEncoder {
     }
 }
 class GpuComputePipeline {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     getBindGroupLayout(index) {
         throw new Todo;
     }
@@ -884,6 +1443,11 @@ class GpuPipelineLayout {
     }
 }
 class GpuQuerySet {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     destroy() {
         throw new Todo;
     }
@@ -907,15 +1471,43 @@ class GpuQueue {
         throw new Todo;
     }
     writeBufferWithCopy(buffer, bufferOffset, data, dataOffset, size) {
-        throw new Todo;
+        let dataOffsetNumber;
+        if (dataOffset) {
+            dataOffsetNumber = bigIntToNumber(dataOffset);
+        }
+        let sizeNumber;
+        if (size) {
+            sizeNumber = bigIntToNumber(size);
+        }
+        return this[inner].writeBuffer(buffer[inner], bigIntToNumber(bufferOffset), data, dataOffsetNumber, sizeNumber);
     }
     writeTextureWithCopy(destination, data, dataLayout, size) {
-        throw new Todo;
+        let offset;
+        if (dataLayout.offset) {
+            offset = bigIntToNumber(dataLayout.offset);
+        }
+        return this[inner].writeTexture({
+            ...destination,
+            texture: destination.texture[inner],
+        }, data, {
+            ...dataLayout,
+            offset
+        }, size);
     }
 }
 class GpuRenderBundle {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
 }
 class GpuRenderBundleEncoder {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     finish(descriptor) {
         throw new Todo;
     }
@@ -935,7 +1527,15 @@ class GpuRenderBundleEncoder {
         throw new Todo;
     }
     setIndexBuffer(buffer, indexFormat, offset, size) {
-        throw new Todo;
+        let offsetNumber;
+        if (offset) {
+            offsetNumber = bigIntToNumber(offset);
+        }
+        let sizeNumber;
+        if (size) {
+            sizeNumber = bigIntToNumber(size);
+        }
+        return this[inner].setIndexBuffer(buffer[inner], indexFormat, offsetNumber, sizeNumber);
     }
     setVertexBuffer(slot, buffer, offset, size) {
         throw new Todo;
@@ -993,22 +1593,61 @@ class GpuRenderPassEncoder {
         throw new Todo;
     }
     setBindGroup(index, bindGroup, dynamicOffsetsData, dynamicOffsetsDataStart, dynamicOffsetsDataLength) {
-        throw new Todo;
+        let bindGroupWeb;
+        if (bindGroup) {
+            bindGroupWeb = bindGroup[inner];
+        }
+        if (dynamicOffsetsData === undefined) {
+            return this[inner].setBindGroup(index, bindGroupWeb);
+        }
+        else {
+            let dynamicOffsetsDataStartNumber;
+            if (dynamicOffsetsDataStart) {
+                dynamicOffsetsDataStartNumber = bigIntToNumber(dynamicOffsetsDataStart);
+            }
+            else {
+                dynamicOffsetsDataStartNumber = 0;
+            }
+            if (dynamicOffsetsDataLength === undefined) {
+                dynamicOffsetsDataLength = dynamicOffsetsData.length - dynamicOffsetsDataStartNumber;
+            }
+            return this[inner].setBindGroup(index, bindGroupWeb, dynamicOffsetsData, dynamicOffsetsDataStartNumber, dynamicOffsetsDataLength);
+        }
     }
     setPipeline(pipeline) {
         return this[inner].setPipeline(pipeline[inner]);
     }
     setIndexBuffer(buffer, indexFormat, offset, size) {
-        throw new Todo;
+        let offsetNumber;
+        if (offset) {
+            offsetNumber = bigIntToNumber(offset);
+        }
+        let sizeNumber;
+        if (size) {
+            sizeNumber = bigIntToNumber(size);
+        }
+        return this[inner].setIndexBuffer(buffer[inner], indexFormat, offsetNumber, sizeNumber);
     }
     setVertexBuffer(slot, buffer, offset, size) {
-        throw new Todo;
+        let bufferWeb;
+        if (buffer) {
+            bufferWeb = buffer[inner];
+        }
+        let offsetNumber;
+        if (offset) {
+            offsetNumber = bigIntToNumber(offset);
+        }
+        let sizeNumber;
+        if (size) {
+            sizeNumber = bigIntToNumber(size);
+        }
+        return this[inner].setVertexBuffer(slot, bufferWeb, offsetNumber, sizeNumber);
     }
     draw(vertexCount, instanceCount, firstVertex, firstInstance) {
         return this[inner].draw(vertexCount, instanceCount, firstVertex, firstInstance);
     }
     drawIndexed(indexCount, instanceCount, firstIndex, baseVertex, firstInstance) {
-        throw new Todo;
+        return this[inner].drawIndexed(indexCount, instanceCount, firstIndex, baseVertex, firstInstance);
     }
     drawIndirect(indirectBuffer, indirectOffset) {
         throw new Todo;
@@ -1028,6 +1667,11 @@ class GpuRenderPipeline {
     }
 }
 class GpuSampler {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
 }
 class GpuShaderModule {
     [inner];
@@ -1040,6 +1684,11 @@ class GpuShaderModule {
     }
 }
 class GpuShaderStage {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     static vertex() {
         throw new Todo;
     }
@@ -1051,103 +1700,113 @@ class GpuShaderStage {
     }
 }
 class GpuSupportedFeatures {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     has(value) {
-        throw new Todo;
+        return this[inner].has(value);
     }
 }
 class GpuSupportedLimits {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     maxTextureDimension1D() {
-        throw new Todo;
+        return this[inner].maxTextureDimension1D;
     }
     maxTextureDimension2D() {
-        throw new Todo;
+        return this[inner].maxTextureDimension2D;
     }
     maxTextureDimension3D() {
-        throw new Todo;
+        return this[inner].maxTextureDimension3D;
     }
     maxTextureArrayLayers() {
-        throw new Todo;
+        return this[inner].maxTextureArrayLayers;
     }
     maxBindGroups() {
-        throw new Todo;
+        return this[inner].maxBindGroups;
     }
     maxBindGroupsPlusVertexBuffers() {
-        throw new Todo;
+        return this[inner].maxBindGroupsPlusVertexBuffers;
     }
     maxBindingsPerBindGroup() {
-        throw new Todo;
+        return this[inner].maxBindingsPerBindGroup;
     }
     maxDynamicUniformBuffersPerPipelineLayout() {
-        throw new Todo;
+        return this[inner].maxDynamicUniformBuffersPerPipelineLayout;
     }
     maxDynamicStorageBuffersPerPipelineLayout() {
-        throw new Todo;
+        return this[inner].maxDynamicStorageBuffersPerPipelineLayout;
     }
     maxSampledTexturesPerShaderStage() {
-        throw new Todo;
+        return this[inner].maxSampledTexturesPerShaderStage;
     }
     maxSamplersPerShaderStage() {
-        throw new Todo;
+        return this[inner].maxSamplersPerShaderStage;
     }
     maxStorageBuffersPerShaderStage() {
-        throw new Todo;
+        return this[inner].maxStorageBuffersPerShaderStage;
     }
     maxStorageTexturesPerShaderStage() {
-        throw new Todo;
+        return this[inner].maxStorageTexturesPerShaderStage;
     }
     maxUniformBuffersPerShaderStage() {
-        throw new Todo;
+        return this[inner].maxUniformBuffersPerShaderStage;
     }
     maxUniformBufferBindingSize() {
-        throw new Todo;
+        return BigInt(this[inner].maxUniformBufferBindingSize);
     }
     maxStorageBufferBindingSize() {
-        throw new Todo;
+        return BigInt(this[inner].maxStorageBufferBindingSize);
     }
     minUniformBufferOffsetAlignment() {
-        throw new Todo;
+        return this[inner].minUniformBufferOffsetAlignment;
     }
     minStorageBufferOffsetAlignment() {
-        throw new Todo;
+        return this[inner].minStorageBufferOffsetAlignment;
     }
     maxVertexBuffers() {
-        throw new Todo;
+        return this[inner].maxVertexBuffers;
     }
     maxBufferSize() {
-        throw new Todo;
+        return BigInt(this[inner].maxBufferSize);
     }
     maxVertexAttributes() {
-        throw new Todo;
+        return this[inner].maxVertexAttributes;
     }
     maxVertexBufferArrayStride() {
-        throw new Todo;
+        return this[inner].maxVertexBufferArrayStride;
     }
     maxInterStageShaderVariables() {
-        throw new Todo;
+        return this[inner].maxInterStageShaderVariables;
     }
     maxColorAttachments() {
-        throw new Todo;
+        return this[inner].maxColorAttachments;
     }
     maxColorAttachmentBytesPerSample() {
-        throw new Todo;
+        return this[inner].maxColorAttachmentBytesPerSample;
     }
     maxComputeWorkgroupStorageSize() {
-        throw new Todo;
+        return this[inner].maxComputeWorkgroupStorageSize;
     }
     maxComputeInvocationsPerWorkgroup() {
-        throw new Todo;
+        return this[inner].maxComputeInvocationsPerWorkgroup;
     }
     maxComputeWorkgroupSizeX() {
-        throw new Todo;
+        return this[inner].maxComputeWorkgroupSizeX;
     }
     maxComputeWorkgroupSizeY() {
-        throw new Todo;
+        return this[inner].maxComputeWorkgroupSizeY;
     }
     maxComputeWorkgroupSizeZ() {
-        throw new Todo;
+        return this[inner].maxComputeWorkgroupSizeZ;
     }
     maxComputeWorkgroupsPerDimension() {
-        throw new Todo;
+        return this[inner].maxComputeWorkgroupsPerDimension;
     }
 }
 class GpuTexture {
@@ -1201,6 +1860,11 @@ class GpuTexture {
     }
 }
 class GpuTextureUsage {
+    [inner];
+    constructor(k, i) {
+        privateConstructorCalled(k);
+        this[inner] = i;
+    }
     static copySrc() {
         throw new Todo;
     }
