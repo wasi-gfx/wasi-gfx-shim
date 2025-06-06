@@ -216,24 +216,18 @@ function numberToBigInt(number: number): bigint {
 }
 
 const inner = Symbol("inner");
-const key = Symbol("key");
-function privateConstructorCalled(k: symbol) {
-	if (k !== key)
-		throw new TypeError("Illegal constructor.");
-}
 
 export class Gpu {
 	[inner]: globalThis.GPU;
 
-	constructor(k: symbol, i: globalThis.GPU) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPU) {
 		this[inner] = i;
 	}
 
 	async requestAdapter(options?: GpuRequestAdapterOptions): Promise<GpuAdapter | undefined> {
 		const adapter = await this[inner].requestAdapter(options);
 		if (adapter)
-			return new GpuAdapter(key, adapter);
+			return new GpuAdapter(adapter);
 		return undefined;
 	}
 
@@ -249,21 +243,20 @@ export class Gpu {
 export class GpuAdapter {
 	[inner]: globalThis.GPUAdapter;
 
-	constructor(k: symbol, i: globalThis.GPUAdapter) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUAdapter) {
 		this[inner] = i;
 	}
 
 	features(): GpuSupportedFeatures {
-		return new GpuSupportedFeatures(key, this[inner].features);
+		return new GpuSupportedFeatures(this[inner].features);
 	}
 
 	limits(): GpuSupportedLimits {
-		return new GpuSupportedLimits(key, this[inner].limits);
+		return new GpuSupportedLimits(this[inner].limits);
 	}
 
 	info(): GpuAdapterInfo {
-		return new GpuAdapterInfo(key, this[inner].info);
+		return new GpuAdapterInfo(this[inner].info);
 	}
 
 	isFallbackAdapter(): boolean {
@@ -283,15 +276,14 @@ export class GpuAdapter {
 			requiredFeatures,
 			requiredLimits: undefined, // TODO:
 		});
-		return new GpuDevice(key, device);
+		return new GpuDevice(device);
 	}
 }
 
 export class GpuDevice implements DrawApi {
 	[inner]: globalThis.GPUDevice;
 	#context: GPUCanvasContext | undefined;
-	constructor(k: symbol, i: globalThis.GPUDevice) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUDevice) {
 		this[inner] = i;
 	}
 	displayApiReady(displayApi: DisplayApi): void {
@@ -307,22 +299,22 @@ export class GpuDevice implements DrawApi {
 		return new AbstractBuffer(this.#context.getCurrentTexture());
 	}
 	features(): GpuSupportedFeatures {
-		return new GpuSupportedFeatures(key, this[inner].features);
+		return new GpuSupportedFeatures(this[inner].features);
 	}
 	limits(): GpuSupportedLimits {
-		return new GpuSupportedLimits(key, this[inner].limits);
+		return new GpuSupportedLimits(this[inner].limits);
 	}
 	adapterInfo(): GpuAdapterInfo {
-		return new GpuAdapterInfo(key, this[inner].adapterInfo);
+		return new GpuAdapterInfo(this[inner].adapterInfo);
 	}
 	queue(): GpuQueue {
-		return new GpuQueue(key, this[inner].queue);
+		return new GpuQueue(this[inner].queue);
 	}
 	destroy(): void {
 		throw new Todo;
 	}
 	createBuffer(descriptor: GpuBufferDescriptor): GpuBuffer {
-		return new GpuBuffer(key, this[inner].createBuffer({
+		return new GpuBuffer(this[inner].createBuffer({
 			...descriptor,
 			size: bigIntToNumber(descriptor.size),
 		}));
@@ -340,7 +332,7 @@ export class GpuDevice implements DrawApi {
 		if (descriptor.viewFormats) {
 			viewFormats = descriptor.viewFormats.map(convertTextureFormatWasiToWeb);
 		}
-		return new GpuTexture(key, this[inner].createTexture({
+		return new GpuTexture(this[inner].createTexture({
 			...descriptor,
 			dimension,
 			format: convertTextureFormatWasiToWeb(descriptor.format),
@@ -348,10 +340,10 @@ export class GpuDevice implements DrawApi {
 		}));
 	}
 	createSampler(descriptor?: GpuSamplerDescriptor): GpuSampler {
-		return new GpuSampler(key, this[inner].createSampler(descriptor));
+		return new GpuSampler(this[inner].createSampler(descriptor));
 	}
 	createBindGroupLayout(descriptor: GpuBindGroupLayoutDescriptor): GpuBindGroupLayout {
-		return new GpuBindGroupLayout(key, this[inner].createBindGroupLayout({
+		return new GpuBindGroupLayout(this[inner].createBindGroupLayout({
 			...descriptor,
 			entries: descriptor.entries.map(entry => {
 				let buffer: GPUBufferBindingLayout | undefined;
@@ -405,7 +397,7 @@ export class GpuDevice implements DrawApi {
 		}));
 	}
 	createPipelineLayout(descriptor: GpuPipelineLayoutDescriptor): GpuPipelineLayout {
-		return new GpuPipelineLayout(key, this[inner].createPipelineLayout({
+		return new GpuPipelineLayout(this[inner].createPipelineLayout({
 			...descriptor,
 			bindGroupLayouts: descriptor.bindGroupLayouts.map(bindGroupLayout => {
 				if (bindGroupLayout)
@@ -415,7 +407,7 @@ export class GpuDevice implements DrawApi {
 		}));
 	}
 	createBindGroup(descriptor: GpuBindGroupDescriptor): GpuBindGroup {
-		return new GpuBindGroup(key, this[inner].createBindGroup({
+		return new GpuBindGroup(this[inner].createBindGroup({
 			...descriptor,
 			layout: descriptor.layout[inner],
 			entries: descriptor.entries.map(entry => {
@@ -467,7 +459,7 @@ export class GpuDevice implements DrawApi {
 				};
 			});
 		}
-		return new GpuShaderModule(key, this[inner].createShaderModule({
+		return new GpuShaderModule(this[inner].createShaderModule({
 			...descriptor,
 			compilationHints,
 		}));
@@ -528,7 +520,7 @@ export class GpuDevice implements DrawApi {
 			}
 		}
 
-		return new GpuRenderPipeline(key, this[inner].createRenderPipeline({
+		return new GpuRenderPipeline(this[inner].createRenderPipeline({
 			...descriptor,
 			vertex,
 			depthStencil,
@@ -543,7 +535,7 @@ export class GpuDevice implements DrawApi {
 		throw new Todo;
 	}
 	createCommandEncoder(descriptor?: GpuCommandEncoderDescriptor): GpuCommandEncoder {
-		return new GpuCommandEncoder(key, this[inner].createCommandEncoder({
+		return new GpuCommandEncoder(this[inner].createCommandEncoder({
 			...descriptor,
 		}));
 	}
@@ -572,8 +564,7 @@ export class GpuDevice implements DrawApi {
 
 export class GpuAdapterInfo {
 	[inner]: globalThis.GPUAdapterInfo;
-	constructor(k: symbol, i: globalThis.GPUAdapterInfo) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUAdapterInfo) {
 		this[inner] = i;
 	}
 	vendor(): string {
@@ -598,23 +589,20 @@ export class GpuAdapterInfo {
 
 export class GpuBindGroup {
 	[inner]: globalThis.GPUBindGroup;
-	constructor(k: symbol, i: globalThis.GPUBindGroup) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUBindGroup) {
 		this[inner] = i;
 	}
 }
 export class GpuBindGroupLayout {
 	[inner]: globalThis.GPUBindGroupLayout;
-	constructor(k: symbol, i: globalThis.GPUBindGroupLayout) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUBindGroupLayout) {
 		this[inner] = i;
 	}
 }
 export class GpuBuffer {
 	[inner]: globalThis.GPUBuffer;
 	#mappedRange: Uint8Array | undefined;
-	constructor(k: symbol, i: globalThis.GPUBuffer) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUBuffer) {
 		this[inner] = i;
 	}
 	size(): GpuSize64Out {
@@ -736,15 +724,13 @@ export class GpuColorWrite {
 
 export class GpuCommandBuffer {
 	[inner]: globalThis.GPUCommandBuffer;
-	constructor(k: symbol, i: globalThis.GPUCommandBuffer) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUCommandBuffer) {
 		this[inner] = i;
 	}
 }
 export class GpuCommandEncoder {
 	[inner]: GPUCommandEncoder;
-	constructor(k: symbol, i: globalThis.GPUCommandEncoder) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUCommandEncoder) {
 		this[inner] = i;
 	}
 	beginRenderPass(descriptor: GpuRenderPassDescriptor): GpuRenderPassEncoder {
@@ -784,7 +770,7 @@ export class GpuCommandEncoder {
 		if (descriptor?.maxDrawCount) {
 			maxDrawCount = bigIntToNumber(descriptor.maxDrawCount);
 		}
-		return new GpuRenderPassEncoder(key, this[inner].beginRenderPass({
+		return new GpuRenderPassEncoder(this[inner].beginRenderPass({
 			...descriptor,
 			colorAttachments,
 			depthStencilAttachment,
@@ -815,7 +801,7 @@ export class GpuCommandEncoder {
 		throw new Todo;
 	}
 	finish(descriptor?: GpuCommandBufferDescriptor): GpuCommandBuffer {
-		return new GpuCommandBuffer(key, this[inner].finish({
+		return new GpuCommandBuffer(this[inner].finish({
 			...descriptor
 		}));
 	}
@@ -863,8 +849,7 @@ export class GpuCompilationMessage {
 
 export class GpuComputePassEncoder {
 	[inner]: globalThis.GPUComputePassEncoder;
-	constructor(k: symbol, i: globalThis.GPUComputePassEncoder) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUComputePassEncoder) {
 		this[inner] = i;
 	}
 	setPipeline(pipeline: GpuComputePipeline): void {
@@ -895,8 +880,7 @@ export class GpuComputePassEncoder {
 
 export class GpuComputePipeline {
 	[inner]: globalThis.GPUComputePipeline;
-	constructor(k: symbol, i: globalThis.GPUComputePipeline) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUComputePipeline) {
 		this[inner] = i;
 	}
 	getBindGroupLayout(index: number): GpuBindGroupLayout {
@@ -915,15 +899,13 @@ export class GpuMapMode {
 
 export class GpuPipelineLayout {
 	[inner]: globalThis.GPUPipelineLayout;
-	constructor(k: symbol, i: globalThis.GPUPipelineLayout) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUPipelineLayout) {
 		this[inner] = i;
 	}
 }
 export class GpuQuerySet {
 	[inner]: globalThis.GPUQuerySet;
-	constructor(k: symbol, i: globalThis.GPUQuerySet) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUQuerySet) {
 		this[inner] = i;
 	}
 	destroy(): void {
@@ -939,8 +921,7 @@ export class GpuQuerySet {
 
 export class GpuQueue {
 	[inner]: globalThis.GPUQueue;
-	constructor(k: symbol, i: globalThis.GPUQueue) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUQueue) {
 		this[inner] = i;
 	}
 	submit(commandBuffers: Array<GpuCommandBuffer>): void {
@@ -988,8 +969,7 @@ export class GpuQueue {
 
 export class GpuRenderBundle {
 	[inner]: globalThis.GPURenderBundle;
-	constructor(k: symbol, i: globalThis.GPURenderBundle) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPURenderBundle) {
 		this[inner] = i;
 	}
 	
@@ -997,8 +977,7 @@ export class GpuRenderBundle {
 
 export class GpuRenderBundleEncoder {
 	[inner]: globalThis.GPURenderBundleEncoder;
-	constructor(k: symbol, i: globalThis.GPURenderBundleEncoder) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPURenderBundleEncoder) {
 		this[inner] = i;
 	}
 	finish(descriptor?: GpuRenderBundleDescriptor): GpuRenderBundle {
@@ -1054,8 +1033,7 @@ export class GpuRenderBundleEncoder {
 
 export class GpuRenderPassEncoder {
 	[inner]: globalThis.GPURenderPassEncoder;
-	constructor(k: symbol, i: globalThis.GPURenderPassEncoder) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPURenderPassEncoder) {
 		this[inner] = i;
 	}
 	setViewport(x: number, y: number, width: number, height: number, minDepth: number, maxDepth: number): void {
@@ -1175,8 +1153,7 @@ export class GpuRenderPassEncoder {
 
 export class GpuRenderPipeline {
 	[inner]: globalThis.GPURenderPipeline;
-	constructor(k: symbol, i: globalThis.GPURenderPipeline) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPURenderPipeline) {
 		this[inner] = i;
 	}
 	getBindGroupLayout(index: number): GpuBindGroupLayout {
@@ -1186,16 +1163,14 @@ export class GpuRenderPipeline {
 
 export class GpuSampler {
 	[inner]: globalThis.GPUSampler;
-	constructor(k: symbol, i: globalThis.GPUSampler) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUSampler) {
 		this[inner] = i;
 	}
 }
 
 export class GpuShaderModule {
 	[inner]: globalThis.GPUShaderModule;
-	constructor(k: symbol, i: globalThis.GPUShaderModule) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUShaderModule) {
 		this[inner] = i;
 	}
 	getCompilationInfo(): GpuCompilationInfo {
@@ -1205,8 +1180,7 @@ export class GpuShaderModule {
 
 export class GpuShaderStage {
 	[inner]: globalThis.GPUShaderStage;
-	constructor(k: symbol, i: globalThis.GPUShaderStage) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUShaderStage) {
 		this[inner] = i;
 	}
 	static vertex(): GpuFlagsConstant {
@@ -1222,8 +1196,7 @@ export class GpuShaderStage {
 
 export class GpuSupportedFeatures {
 	[inner]: globalThis.GPUSupportedFeatures;
-	constructor(k: symbol, i: globalThis.GPUSupportedFeatures) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUSupportedFeatures) {
 		this[inner] = i;
 	}
 	has(value: string): boolean {
@@ -1233,8 +1206,7 @@ export class GpuSupportedFeatures {
 
 export class GpuSupportedLimits {
 	[inner]: globalThis.GPUSupportedLimits;
-	constructor(k: symbol, i: globalThis.GPUSupportedLimits) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUSupportedLimits) {
 		this[inner] = i;
 	}
 	maxTextureDimension1D(): number {
@@ -1334,8 +1306,7 @@ export class GpuSupportedLimits {
 
 export class GpuTexture {
 	[inner]: globalThis.GPUTexture;
-	constructor(k: symbol, i: globalThis.GPUTexture) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUTexture) {
 		this[inner] = i;
 	}
 	createView(descriptor?: GpuTextureViewDescriptor): GpuTextureView {
@@ -1345,7 +1316,7 @@ export class GpuTexture {
 		let dimension: GPUTextureViewDimension | undefined;
 		if (descriptor?.dimension)
 			dimension = convertTextureViewDimensionWasiToWeb(descriptor.dimension);
-		return new GpuTextureView(key, this[inner].createView({
+		return new GpuTextureView(this[inner].createView({
 			...descriptor,
 			dimension,
 			format,
@@ -1379,14 +1350,13 @@ export class GpuTexture {
 		throw new Todo;
 	}
 	static fromGraphicsBuffer(buffer: AbstractBuffer): GpuTexture {
-		return new GpuTexture(key, buffer.buffer);
+		return new GpuTexture(buffer.buffer);
 	}
 }
 
 export class GpuTextureUsage {
 	[inner]: globalThis.GPUTextureUsage;
-	constructor(k: symbol, i: globalThis.GPUTextureUsage) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUTextureUsage) {
 		this[inner] = i;
 	}
 	static copySrc(): GpuFlagsConstant {
@@ -1408,8 +1378,7 @@ export class GpuTextureUsage {
 
 export class GpuTextureView {
 	[inner]: globalThis.GPUTextureView;
-	constructor(k: symbol, i: globalThis.GPUTextureView) {
-		privateConstructorCalled(k);
+	constructor(i: globalThis.GPUTextureView) {
 		this[inner] = i;
 	}
 }
@@ -2091,5 +2060,5 @@ export interface WriteBufferError {
 }
 
 export function getGpu(): Gpu {
-	return new Gpu(key, navigator.gpu);
+	return new Gpu(navigator.gpu);
 }

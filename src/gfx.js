@@ -764,21 +764,15 @@ function numberToBigInt(number) {
     return BigInt(number);
 }
 const inner = Symbol("inner");
-const key = Symbol("key");
-function privateConstructorCalled(k) {
-    if (k !== key)
-        throw new TypeError("Illegal constructor.");
-}
 class Gpu {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     async requestAdapter(options) {
         const adapter = await this[inner].requestAdapter(options);
         if (adapter)
-            return new GpuAdapter(key, adapter);
+            return new GpuAdapter(adapter);
         return undefined;
     }
     getPreferredCanvasFormat() {
@@ -790,18 +784,17 @@ class Gpu {
 }
 class GpuAdapter {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     features() {
-        return new GpuSupportedFeatures(key, this[inner].features);
+        return new GpuSupportedFeatures(this[inner].features);
     }
     limits() {
-        return new GpuSupportedLimits(key, this[inner].limits);
+        return new GpuSupportedLimits(this[inner].limits);
     }
     info() {
-        return new GpuAdapterInfo(key, this[inner].info);
+        return new GpuAdapterInfo(this[inner].info);
     }
     isFallbackAdapter() {
         throw new Todo;
@@ -817,14 +810,13 @@ class GpuAdapter {
             requiredFeatures,
             requiredLimits: undefined, // TODO:
         });
-        return new GpuDevice(key, device);
+        return new GpuDevice(device);
     }
 }
 class GpuDevice {
     [inner];
     #context;
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     displayApiReady(displayApi) {
@@ -840,22 +832,22 @@ class GpuDevice {
         return new AbstractBuffer(this.#context.getCurrentTexture());
     }
     features() {
-        return new GpuSupportedFeatures(key, this[inner].features);
+        return new GpuSupportedFeatures(this[inner].features);
     }
     limits() {
-        return new GpuSupportedLimits(key, this[inner].limits);
+        return new GpuSupportedLimits(this[inner].limits);
     }
     adapterInfo() {
-        return new GpuAdapterInfo(key, this[inner].adapterInfo);
+        return new GpuAdapterInfo(this[inner].adapterInfo);
     }
     queue() {
-        return new GpuQueue(key, this[inner].queue);
+        return new GpuQueue(this[inner].queue);
     }
     destroy() {
         throw new Todo;
     }
     createBuffer(descriptor) {
-        return new GpuBuffer(key, this[inner].createBuffer({
+        return new GpuBuffer(this[inner].createBuffer({
             ...descriptor,
             size: bigIntToNumber(descriptor.size),
         }));
@@ -872,7 +864,7 @@ class GpuDevice {
         if (descriptor.viewFormats) {
             viewFormats = descriptor.viewFormats.map(convertTextureFormatWasiToWeb);
         }
-        return new GpuTexture(key, this[inner].createTexture({
+        return new GpuTexture(this[inner].createTexture({
             ...descriptor,
             dimension,
             format: convertTextureFormatWasiToWeb(descriptor.format),
@@ -880,10 +872,10 @@ class GpuDevice {
         }));
     }
     createSampler(descriptor) {
-        return new GpuSampler(key, this[inner].createSampler(descriptor));
+        return new GpuSampler(this[inner].createSampler(descriptor));
     }
     createBindGroupLayout(descriptor) {
-        return new GpuBindGroupLayout(key, this[inner].createBindGroupLayout({
+        return new GpuBindGroupLayout(this[inner].createBindGroupLayout({
             ...descriptor,
             entries: descriptor.entries.map(entry => {
                 let buffer;
@@ -937,7 +929,7 @@ class GpuDevice {
         }));
     }
     createPipelineLayout(descriptor) {
-        return new GpuPipelineLayout(key, this[inner].createPipelineLayout({
+        return new GpuPipelineLayout(this[inner].createPipelineLayout({
             ...descriptor,
             bindGroupLayouts: descriptor.bindGroupLayouts.map(bindGroupLayout => {
                 if (bindGroupLayout)
@@ -947,7 +939,7 @@ class GpuDevice {
         }));
     }
     createBindGroup(descriptor) {
-        return new GpuBindGroup(key, this[inner].createBindGroup({
+        return new GpuBindGroup(this[inner].createBindGroup({
             ...descriptor,
             layout: descriptor.layout[inner],
             entries: descriptor.entries.map(entry => {
@@ -999,7 +991,7 @@ class GpuDevice {
                 };
             });
         }
-        return new GpuShaderModule(key, this[inner].createShaderModule({
+        return new GpuShaderModule(this[inner].createShaderModule({
             ...descriptor,
             compilationHints,
         }));
@@ -1061,7 +1053,7 @@ class GpuDevice {
                 }),
             };
         }
-        return new GpuRenderPipeline(key, this[inner].createRenderPipeline({
+        return new GpuRenderPipeline(this[inner].createRenderPipeline({
             ...descriptor,
             vertex,
             depthStencil,
@@ -1076,7 +1068,7 @@ class GpuDevice {
         throw new Todo;
     }
     createCommandEncoder(descriptor) {
-        return new GpuCommandEncoder(key, this[inner].createCommandEncoder({
+        return new GpuCommandEncoder(this[inner].createCommandEncoder({
             ...descriptor,
         }));
     }
@@ -1104,8 +1096,7 @@ class GpuDevice {
 }
 class GpuAdapterInfo {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     vendor() {
@@ -1129,23 +1120,20 @@ class GpuAdapterInfo {
 }
 class GpuBindGroup {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
 }
 class GpuBindGroupLayout {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
 }
 class GpuBuffer {
     [inner];
     #mappedRange;
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     size() {
@@ -1263,15 +1251,13 @@ class GpuColorWrite {
 }
 class GpuCommandBuffer {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
 }
 class GpuCommandEncoder {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     beginRenderPass(descriptor) {
@@ -1312,7 +1298,7 @@ class GpuCommandEncoder {
         if (descriptor?.maxDrawCount) {
             maxDrawCount = bigIntToNumber(descriptor.maxDrawCount);
         }
-        return new GpuRenderPassEncoder(key, this[inner].beginRenderPass({
+        return new GpuRenderPassEncoder(this[inner].beginRenderPass({
             ...descriptor,
             colorAttachments,
             depthStencilAttachment,
@@ -1343,7 +1329,7 @@ class GpuCommandEncoder {
         throw new Todo;
     }
     finish(descriptor) {
-        return new GpuCommandBuffer(key, this[inner].finish({
+        return new GpuCommandBuffer(this[inner].finish({
             ...descriptor
         }));
     }
@@ -1388,8 +1374,7 @@ class GpuCompilationMessage {
 }
 class GpuComputePassEncoder {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     setPipeline(pipeline) {
@@ -1419,8 +1404,7 @@ class GpuComputePassEncoder {
 }
 class GpuComputePipeline {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     getBindGroupLayout(index) {
@@ -1437,15 +1421,13 @@ class GpuMapMode {
 }
 class GpuPipelineLayout {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
 }
 class GpuQuerySet {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     destroy() {
@@ -1460,8 +1442,7 @@ class GpuQuerySet {
 }
 class GpuQueue {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     submit(commandBuffers) {
@@ -1497,15 +1478,13 @@ class GpuQueue {
 }
 class GpuRenderBundle {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
 }
 class GpuRenderBundleEncoder {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     finish(descriptor) {
@@ -1555,8 +1534,7 @@ class GpuRenderBundleEncoder {
 }
 class GpuRenderPassEncoder {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     setViewport(x, y, width, height, minDepth, maxDepth) {
@@ -1658,8 +1636,7 @@ class GpuRenderPassEncoder {
 }
 class GpuRenderPipeline {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     getBindGroupLayout(index) {
@@ -1668,15 +1645,13 @@ class GpuRenderPipeline {
 }
 class GpuSampler {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
 }
 class GpuShaderModule {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     getCompilationInfo() {
@@ -1685,8 +1660,7 @@ class GpuShaderModule {
 }
 class GpuShaderStage {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     static vertex() {
@@ -1701,8 +1675,7 @@ class GpuShaderStage {
 }
 class GpuSupportedFeatures {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     has(value) {
@@ -1711,8 +1684,7 @@ class GpuSupportedFeatures {
 }
 class GpuSupportedLimits {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     maxTextureDimension1D() {
@@ -1811,8 +1783,7 @@ class GpuSupportedLimits {
 }
 class GpuTexture {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     createView(descriptor) {
@@ -1822,7 +1793,7 @@ class GpuTexture {
         let dimension;
         if (descriptor?.dimension)
             dimension = convertTextureViewDimensionWasiToWeb(descriptor.dimension);
-        return new GpuTextureView(key, this[inner].createView({
+        return new GpuTextureView(this[inner].createView({
             ...descriptor,
             dimension,
             format,
@@ -1856,13 +1827,12 @@ class GpuTexture {
         throw new Todo;
     }
     static fromGraphicsBuffer(buffer) {
-        return new GpuTexture(key, buffer.buffer);
+        return new GpuTexture(buffer.buffer);
     }
 }
 class GpuTextureUsage {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
     static copySrc() {
@@ -1883,8 +1853,7 @@ class GpuTextureUsage {
 }
 class GpuTextureView {
     [inner];
-    constructor(k, i) {
-        privateConstructorCalled(k);
+    constructor(i) {
         this[inner] = i;
     }
 }
@@ -1965,7 +1934,7 @@ class GpuError {
     }
 }
 function getGpu() {
-    return new Gpu(key, navigator.gpu);
+    return new Gpu(navigator.gpu);
 }
 
 class Buffer {
