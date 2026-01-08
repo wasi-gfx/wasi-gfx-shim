@@ -1,4 +1,4 @@
-# wasi-gfx-ship implements the wasi-gfx on top of the browser's WebGPU API.
+# wasi-gfx-shim implements the wasi-gfx on top of the browser's WebGPU API.
 
 ## Compile the TypeScript
 ```shell
