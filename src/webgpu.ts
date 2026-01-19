@@ -637,7 +637,15 @@ export class GpuBuffer {
 		return this[inner].mapState;
 	}
 	async mapAsync(mode: GpuMapModeFlags, offset?: GpuSize64, size?: GpuSize64): Promise<void> {
-		return await this[inner].mapAsync(mode);
+		let offsetNumber: number | undefined;
+		if (offset) {
+			offsetNumber = bigIntToNumber(offset);
+		}
+		let sizeNumber: number | undefined;
+		if (size) {
+			sizeNumber = bigIntToNumber(size);
+		}
+		return await this[inner].mapAsync(mode, offsetNumber, sizeNumber);
 	}
 	getMappedRangeGetWithCopy(offset?: GpuSize64, size?: GpuSize64): Uint8Array {
 		// TODO: letting getMappedRange be called multiple times until we figure out how to avoid the with-copy behavior
