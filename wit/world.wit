@@ -1,0 +1,9 @@
+package wasi-gfx:wasi-gfx-shim;
+
+// This world is not used directly, the includes are the manifest that tells `wkg wit fetch` what to vendor into wit/deps.
+world bindings {
+    include wasi:webgpu/imports@0.3.0-rc.2;
+    include wasi-gfx:surface/webgpu-imports@0.2.0;
+    include wasi-gfx:frame-buffer/imports@0.2.0;
+    include wasi-gfx:surface/frame-buffer-imports@0.2.0;
+}

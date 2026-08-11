@@ -17,8 +17,8 @@
         let script = document.createElement("script");
         script.type = "module";
         script.textContent = `
-            import { "wasi:cli/run@0.2.0" as wasiCliRun } from './static/${example}.js';
-            wasiCliRun.run();
+            import { run } from './static/${example}.js';
+            run.run();
         `;
         document.body.appendChild(script);
     </script>
