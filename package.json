@@ -1,13 +1,21 @@
 {
   "version": "1.0.0",
   "scripts": {
-    "build": "rollup --config './src/rollup.config.js'",
-    "example": "npm run build && jco transpile --async-mode jspi --no-nodejs-compat ./examples/$npm_config_example.wasm -o ./examples/static --async-exports 'run' --async-imports 'wasi:webgpu/webgpu#[method]gpu.request-adapter' --async-imports 'wasi:webgpu/webgpu#[method]gpu-adapter.request-device' --async-imports 'wasi:webgpu/webgpu#[method]gpu-buffer.map-async' --async-imports 'wasi:webgpu/webgpu#[method]gpu-device.pop-error-scope' --async-imports 'wasi:webgpu/webgpu#[method]gpu-shader-module.get-compilation-info' --async-wasi-imports --async-wasi-exports --map 'wasi:filesystem/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/filesystem.js#*' --map 'wasi:clocks/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/clocks.js#*' --map 'wasi:io/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/io.js#*' --map 'wasi:random/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/random.js#*' --map 'wasi:cli/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/cli.js#*' --map 'wasi:sockets/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/sockets.js#*' --map 'wasi:cli/*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/cli.js#*' --map 'wasi:io/poll=./gfx.js#poll' --map 'wasi:webgpu/webgpu=./gfx.js' --map 'wasi:surface/surface=./gfx.js' --map 'wasi:graphics-context/graphics-context=./gfx.js' --map 'wasi:frame-buffer/frame-buffer=./gfx.js' && cp src/gfx.js examples/static/gfx.js"
+    "example": "npm run build && jco transpile ./examples/$npm_config_example.wasm -o ./examples/static --no-nodejs-compat --bindgen-enable-wasm-exnref --async-wasi-imports --async-wasi-exports --map 'wasi:filesystem/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/filesystem.js#*' --map 'wasi:clocks/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/clocks.js#*' --map 'wasi:random/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/random.js#*' --map 'wasi:cli/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/cli.js#*' --map 'wasi:sockets/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/sockets.js#*' --map 'wasi:http/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/http.js#*' --map 'wasi:io/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/io.js#*' --map 'wasi:filesystem/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/filesystem.js#*' --map 'wasi:clocks/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/clocks.js#*' --map 'wasi:random/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/random.js#*' --map 'wasi:cli/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/cli.js#*' --map 'wasi:sockets/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/sockets.js#*' --map 'wasi:http/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/http.js#*' --map 'wasi:webgpu/webgpu=../../dist/webgpu.js' --map 'wasi-gfx:surface/surface=../../dist/surface.js' --map 'wasi-gfx:surface/surface-webgpu=../../dist/surface-webgpu.js' --map 'wasi-gfx:frame-buffer/frame-buffer=../../dist/frame-buffer.js' --map 'wasi-gfx:surface/surface-frame-buffer=../../dist/surface-frame-buffer.js' --async-exports '[constructor]model' '[method]model.tokenize' '[method]model.detokenize' '[method]model.is-eog' '[method]model.apply-chat-template' '[method]model.description' '[method]model.n-ctx-train' '[constructor]context' '[method]context.append' '[method]context.append-tokens' '[method]context.n-past' '[method]context.clear' '[constructor]sampler' '[method]sampler.sample'",
+    "wit-fetch": "wkg wit fetch --config ./wkg-config.toml",
+    "generate-types": "jco types -o types",
+    "format": "prettier --write --cache src",
+    "format:check": "prettier --check src",
+    "build": "rollup --config ./rollup.config.js"
   },
+  "type": "module",
   "devDependencies": {
+    "@bytecodealliance/jco": "^1.28.0",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@webgpu/types": "^0.1.52",
+    "@webgpu/types": "^0.1.71",
+    "prettier": "^3.9.6",
     "rollup": "^4.40.2",
-    "tslib": "^2.8.1"
+    "tslib": "^2.8.1",
+    "type-fest": "^5.8.0"
   }
 }

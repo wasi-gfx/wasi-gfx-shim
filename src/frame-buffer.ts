@@ -1,30 +1,15 @@
-import { Todo } from './common.js';
-import { Context, AbstractBuffer } from './graphics-context';
+import { Todo } from "./common";
+import * as wit from "../types/interfaces/wasi-gfx-frame-buffer-frame-buffer";
 
-export class Buffer {
-	static fromGraphicsBuffer(buffer: AbstractBuffer): Buffer {
-		throw new Todo;
-	}
-
-	get(): Uint8Array {
-		throw new Todo;
-	}
-
-	set(val: Uint8Array): void {
-		throw new Todo;
-	}
+export class Buffer implements wit.Buffer {
+    getWithCopy(): Uint8Array {
+        throw new Todo();
+    }
+    setWithCopy(val: Uint8Array): void {
+        throw new Todo();
+    }
 }
 
-export class Device {
-	constructor() {
-		throw new Todo;
-	}
-
-	connectGraphicsContext(context: Context): void {
-		throw new Todo;
-	}
-
-	getContext(): Context {
-		throw new Todo;
-	}
-}
+export default {
+    Buffer,
+} satisfies typeof import("../types/interfaces/wasi-gfx-frame-buffer-frame-buffer");
