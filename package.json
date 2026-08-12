@@ -1,5 +1,21 @@
 {
-  "version": "1.0.0",
+  "name": "@wasi-gfx/wasi-gfx-shim",
+  "version": "0.1.0",
+  "license": "Apache-2.0 WITH LLVM-exception",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wasi-gfx/wasi-gfx-shim.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./webgpu": "./dist/webgpu.js",
+    "./surface": "./dist/surface.js",
+    "./surface-webgpu": "./dist/surface-webgpu.js",
+    "./frame-buffer": "./dist/frame-buffer.js",
+    "./surface-frame-buffer": "./dist/surface-frame-buffer.js"
+  },
   "scripts": {
     "example": "npm run build && jco transpile ./examples/$npm_config_example.wasm -o ./examples/static --no-nodejs-compat --bindgen-enable-wasm-exnref --async-wasi-imports --async-wasi-exports --map 'wasi:filesystem/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/filesystem.js#*' --map 'wasi:clocks/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/clocks.js#*' --map 'wasi:random/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/random.js#*' --map 'wasi:cli/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/cli.js#*' --map 'wasi:sockets/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/sockets.js#*' --map 'wasi:http/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/http.js#*' --map 'wasi:io/*@0.2.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview2-shim/lib/browser/io.js#*' --map 'wasi:filesystem/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/filesystem.js#*' --map 'wasi:clocks/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/clocks.js#*' --map 'wasi:random/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/random.js#*' --map 'wasi:cli/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/cli.js#*' --map 'wasi:sockets/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/sockets.js#*' --map 'wasi:http/*@0.3.*=https://cdn.jsdelivr.net/npm/@bytecodealliance/preview3-shim@0.3.0/dist/browser/http.js#*' --map 'wasi:webgpu/webgpu=../../dist/webgpu.js' --map 'wasi-gfx:surface/surface=../../dist/surface.js' --map 'wasi-gfx:surface/surface-webgpu=../../dist/surface-webgpu.js' --map 'wasi-gfx:frame-buffer/frame-buffer=../../dist/frame-buffer.js' --map 'wasi-gfx:surface/surface-frame-buffer=../../dist/surface-frame-buffer.js' --async-exports '[constructor]model' '[method]model.tokenize' '[method]model.detokenize' '[method]model.is-eog' '[method]model.apply-chat-template' '[method]model.description' '[method]model.n-ctx-train' '[constructor]context' '[method]context.append' '[method]context.append-tokens' '[method]context.n-past' '[method]context.clear' '[constructor]sampler' '[method]sampler.sample'",
     "wit-fetch": "wkg wit fetch --config ./wkg-config.toml",
