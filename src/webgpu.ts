@@ -5,6 +5,14 @@ import { NotAllowed, Todo, Unreachable } from "./common.js";
 import * as wit from "../types/interfaces/wasi-webgpu-webgpu.js";
 import { interfaceKeys, objectKeys } from "./flags-helpers.js";
 
+function optionalConvert<I, O>(
+    value: I | undefined,
+    converter: (v: I) => O,
+): O | undefined {
+    if (typeof value !== "undefined") return converter(value);
+    else return undefined;
+}
+
 export function convertLimitWasiToWeb(
     limit: WasiSupportedLimitString,
 ): keyof GPUSupportedLimits {
@@ -747,9 +755,7 @@ export class GpuAdapter implements wit.GpuAdapter {
             const entries = descriptor.requiredLimits
                 .entries()
                 .map(([wasiKey, wasiValue]) => {
-                    let webValue: number | undefined;
-                    if (typeof wasiValue !== "undefined")
-                        webValue = bigIntToNumber(wasiValue);
+                    const webValue = optionalConvert(wasiValue, bigIntToNumber);
                     const webKey = convertLimitWasiToWeb(
                         wasiKey as WasiSupportedLimitString,
                     );
@@ -803,34 +809,26 @@ export class GpuDevice implements wit.GpuDevice {
         );
     }
     createTexture(descriptor: wit.GpuTextureDescriptor): wit.GpuTexture {
-        let dimension: GPUTextureDimension | undefined;
-        if (descriptor.dimension) {
-            dimension = convertTextureDimensionWasiToWeb(descriptor.dimension);
-        }
-        let format: GPUTextureFormat | undefined;
-        if (descriptor.format) {
-            format = convertTextureFormatWasiToWeb(descriptor.format);
-        }
         let viewFormats: GPUTextureFormat[] | undefined;
         if (descriptor.viewFormats) {
             viewFormats = descriptor.viewFormats.map(
                 convertTextureFormatWasiToWeb,
             );
         }
-        let textureBindingViewDimension: GPUTextureViewDimension | undefined;
-        if (descriptor.textureBindingViewDimension) {
-            textureBindingViewDimension = convertTextureViewDimensionWasiToWeb(
-                descriptor.textureBindingViewDimension,
-            );
-        }
         return new GpuTexture(
             this[inner].createTexture({
                 ...descriptor,
-                usage: convertTextureUsageWasiToWeb(descriptor.usage),
-                dimension,
-                format: convertTextureFormatWasiToWeb(descriptor.format),
                 viewFormats,
-                textureBindingViewDimension,
+                usage: convertTextureUsageWasiToWeb(descriptor.usage),
+                dimension: optionalConvert(
+                    descriptor.dimension,
+                    convertTextureDimensionWasiToWeb,
+                ),
+                format: convertTextureFormatWasiToWeb(descriptor.format),
+                textureBindingViewDimension: optionalConvert(
+                    descriptor.textureBindingViewDimension,
+                    convertTextureViewDimensionWasiToWeb,
+                ),
             }),
         );
     }
@@ -846,15 +844,12 @@ export class GpuDevice implements wit.GpuDevice {
                 entries: descriptor.entries.map((entry) => {
                     let buffer: GPUBufferBindingLayout | undefined;
                     if (entry.buffer) {
-                        let minBindingSize: number | undefined;
-                        if (entry.buffer.minBindingSize) {
-                            minBindingSize = bigIntToNumber(
-                                entry.buffer.minBindingSize,
-                            );
-                        }
                         buffer = {
                             ...entry.buffer,
-                            minBindingSize,
+                            minBindingSize: optionalConvert(
+                                entry.buffer.minBindingSize,
+                                bigIntToNumber,
+                            ),
                         };
                     }
                     let sampler: GPUSamplerBindingLayout | undefined;
@@ -865,34 +860,26 @@ export class GpuDevice implements wit.GpuDevice {
                     }
                     let texture: GPUTextureBindingLayout | undefined;
                     if (entry.texture) {
-                        let viewDimension: GPUTextureViewDimension | undefined;
-                        if (entry.texture.viewDimension) {
-                            viewDimension =
-                                convertTextureViewDimensionWasiToWeb(
-                                    entry.texture.viewDimension,
-                                );
-                        }
                         texture = {
                             ...entry.texture,
-                            viewDimension,
+                            viewDimension: optionalConvert(
+                                entry.texture.viewDimension,
+                                convertTextureViewDimensionWasiToWeb,
+                            ),
                         };
                     }
                     let storageTexture:
                         GPUStorageTextureBindingLayout | undefined;
                     if (entry.storageTexture) {
-                        let viewDimension: GPUTextureViewDimension | undefined;
-                        if (entry.storageTexture.viewDimension) {
-                            viewDimension =
-                                convertTextureViewDimensionWasiToWeb(
-                                    entry.storageTexture.viewDimension,
-                                );
-                        }
                         storageTexture = {
                             ...entry.storageTexture,
                             format: convertTextureFormatWasiToWeb(
                                 entry.storageTexture.format,
                             ),
-                            viewDimension,
+                            viewDimension: optionalConvert(
+                                entry.storageTexture.viewDimension,
+                                convertTextureViewDimensionWasiToWeb,
+                            ),
                         };
                     }
                     return {
@@ -916,13 +903,12 @@ export class GpuDevice implements wit.GpuDevice {
             this[inner].createPipelineLayout({
                 ...descriptor,
                 bindGroupLayouts: descriptor.bindGroupLayouts.map(
-                    (bindGroupLayout) => {
-                        if (bindGroupLayout)
-                            return (bindGroupLayout as GpuBindGroupLayout)[
-                                inner
-                            ];
-                        return undefined;
-                    },
+                    (bindGroupLayout) =>
+                        optionalConvert(
+                            bindGroupLayout,
+                            (bindGroupLayout) =>
+                                (bindGroupLayout as GpuBindGroupLayout)[inner],
+                        ),
                 ),
             }),
         );
@@ -939,23 +925,19 @@ export class GpuDevice implements wit.GpuDevice {
                             resource = (entry.resource.val as GpuBuffer)[inner];
                             break;
                         case "gpu-buffer-binding":
-                            let offset: number | undefined;
-                            if (entry.resource.val.offset) {
-                                offset = bigIntToNumber(
-                                    entry.resource.val.offset,
-                                );
-                            }
-                            let size: number | undefined;
-                            if (entry.resource.val.size) {
-                                size = bigIntToNumber(entry.resource.val.size);
-                            }
                             resource = {
                                 ...entry.resource.val,
                                 buffer: (
                                     entry.resource.val.buffer as GpuBuffer
                                 )[inner],
-                                offset,
-                                size,
+                                offset: optionalConvert(
+                                    entry.resource.val.offset,
+                                    bigIntToNumber,
+                                ),
+                                size: optionalConvert(
+                                    entry.resource.val.size,
+                                    bigIntToNumber,
+                                ),
                             };
                             break;
                         case "gpu-sampler":
@@ -990,16 +972,10 @@ export class GpuDevice implements wit.GpuDevice {
     ): wit.GpuShaderModule {
         let compilationHints: GPUShaderModuleCompilationHint[] | undefined;
         if (descriptor.compilationHints) {
-            compilationHints = descriptor.compilationHints.map((hint) => {
-                let layout: GPUAutoLayoutMode | GPUPipelineLayout | undefined;
-                if (hint.layout) {
-                    layout = convertGpuLayoutWasiToWeb(hint.layout);
-                }
-                return {
-                    ...hint,
-                    layout,
-                };
-            });
+            compilationHints = descriptor.compilationHints.map((hint) => ({
+                ...hint,
+                layout: optionalConvert(hint.layout, convertGpuLayoutWasiToWeb),
+            }));
         }
         return new GpuShaderModule(
             this[inner].createShaderModule({
@@ -1098,15 +1074,12 @@ export class GpuDevice implements wit.GpuDevice {
                 targets: Array.from(descriptor.fragment.targets).map(
                     (target) => {
                         if (target) {
-                            let writeMask: GPUColorWriteFlags | undefined;
-                            if (target.writeMask) {
-                                writeMask = convertColorWriteWasiToWeb(
-                                    target.writeMask,
-                                );
-                            }
                             return {
                                 ...target,
-                                writeMask,
+                                writeMask: optionalConvert(
+                                    target.writeMask,
+                                    convertColorWriteWasiToWeb,
+                                ),
                                 format: convertTextureFormatWasiToWeb(
                                     target.format,
                                 ),
@@ -1151,23 +1124,16 @@ export class GpuDevice implements wit.GpuDevice {
     createRenderBundleEncoder(
         descriptor: wit.GpuRenderBundleEncoderDescriptor,
     ): wit.GpuRenderBundleEncoder {
-        let depthStencilFormat: GPUTextureFormat | undefined;
-        if (descriptor.depthStencilFormat) {
-            depthStencilFormat = convertTextureFormatWasiToWeb(
-                descriptor.depthStencilFormat,
-            );
-        }
         return new GpuRenderBundleEncoder(
             this[inner].createRenderBundleEncoder({
                 ...descriptor,
-                depthStencilFormat,
-                colorFormats: descriptor.colorFormats.map((colorFormat) => {
-                    let colorFormatWeb: GPUTextureFormat | undefined;
-                    if (colorFormat)
-                        colorFormatWeb =
-                            convertTextureFormatWasiToWeb(colorFormat);
-                    return colorFormatWeb;
-                }),
+                depthStencilFormat: optionalConvert(
+                    descriptor.depthStencilFormat,
+                    convertTextureFormatWasiToWeb,
+                ),
+                colorFormats: descriptor.colorFormats.map((colorFormat) =>
+                    optionalConvert(colorFormat, convertTextureFormatWasiToWeb),
+                ),
             }),
         );
     }
@@ -1281,18 +1247,10 @@ export class GpuBuffer implements wit.GpuBuffer {
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): Promise<void> {
-        let offsetNumber: number | undefined;
-        if (offset) {
-            offsetNumber = bigIntToNumber(offset);
-        }
-        let sizeNumber: number | undefined;
-        if (size) {
-            sizeNumber = bigIntToNumber(size);
-        }
         return await this[inner].mapAsync(
             convertMapModeWasiToWeb(mode),
-            offsetNumber,
-            sizeNumber,
+            optionalConvert(offset, bigIntToNumber),
+            optionalConvert(size, bigIntToNumber),
         );
     }
     getMappedRangeGetWithCopy(
@@ -1300,17 +1258,12 @@ export class GpuBuffer implements wit.GpuBuffer {
         size?: wit.GpuSize64,
     ): Uint8Array {
         // TODO: letting getMappedRange be called multiple times until we figure out how to avoid the with-copy behavior
-        let offsetNumber: number | undefined;
-        if (offset) {
-            offsetNumber = bigIntToNumber(offset);
-        }
-        let sizeNumber: number | undefined;
-        if (size) {
-            sizeNumber = bigIntToNumber(size);
-        }
         if (!this.#mappedRange) {
             this.#mappedRange = new Uint8Array(
-                this[inner].getMappedRange(offsetNumber, sizeNumber),
+                this[inner].getMappedRange(
+                    optionalConvert(offset, bigIntToNumber),
+                    optionalConvert(size, bigIntToNumber),
+                ),
             );
         }
         return this.#mappedRange;
@@ -1328,17 +1281,12 @@ export class GpuBuffer implements wit.GpuBuffer {
         size?: wit.GpuSize64,
     ): void {
         // TODO: letting getMappedRange be called multiple times until we figure out how to avoid the with-copy behavior
-        let offsetNumber: number | undefined;
-        if (offset) {
-            offsetNumber = bigIntToNumber(offset);
-        }
-        let sizeNumber: number | undefined;
-        if (size) {
-            sizeNumber = bigIntToNumber(size);
-        }
         if (!this.#mappedRange) {
             this.#mappedRange = new Uint8Array(
-                this[inner].getMappedRange(offsetNumber, sizeNumber),
+                this[inner].getMappedRange(
+                    optionalConvert(offset, bigIntToNumber),
+                    optionalConvert(size, bigIntToNumber),
+                ),
             );
         }
         this.#mappedRange.set(data);
@@ -1424,10 +1372,6 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
                 )[inner],
             };
         }
-        let maxDrawCount: number | undefined;
-        if (descriptor?.maxDrawCount) {
-            maxDrawCount = bigIntToNumber(descriptor.maxDrawCount);
-        }
         return new GpuRenderPassEncoder(
             this[inner].beginRenderPass({
                 ...descriptor,
@@ -1435,7 +1379,10 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
                 depthStencilAttachment,
                 occlusionQuerySet,
                 timestampWrites,
-                maxDrawCount,
+                maxDrawCount: optionalConvert(
+                    descriptor.maxDrawCount,
+                    bigIntToNumber,
+                ),
             }),
         );
     }
@@ -1482,13 +1429,11 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
         destination: wit.GpuTexelCopyTextureInfo,
         copySize: wit.GpuExtent3D,
     ): void {
-        let sourceOffset: number | undefined;
-        if (source.offset) sourceOffset = bigIntToNumber(source.offset);
         this[inner].copyBufferToTexture(
             {
                 ...source,
                 buffer: (source.buffer as GpuBuffer)[inner],
-                offset: sourceOffset,
+                offset: optionalConvert(source.offset, bigIntToNumber),
             },
             {
                 ...destination,
@@ -1502,9 +1447,6 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
         destination: wit.GpuTexelCopyBufferInfo,
         copySize: wit.GpuExtent3D,
     ): void {
-        let destinationOffset: number | undefined;
-        if (destination.offset)
-            destinationOffset = bigIntToNumber(destination.offset);
         this[inner].copyTextureToBuffer(
             {
                 ...source,
@@ -1513,7 +1455,7 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
             {
                 ...destination,
                 buffer: (destination.buffer as GpuBuffer)[inner],
-                offset: destinationOffset,
+                offset: optionalConvert(destination.offset, bigIntToNumber),
             },
             copySize,
         );
@@ -1540,11 +1482,11 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
-        let offsetNumber: number | undefined;
-        if (offset) offsetNumber = bigIntToNumber(offset);
-        let sizeNumber: number | undefined;
-        if (size) sizeNumber = bigIntToNumber(size);
-        this[inner].clearBuffer(buffer[inner], offsetNumber, sizeNumber);
+        this[inner].clearBuffer(
+            buffer[inner],
+            optionalConvert(offset, bigIntToNumber),
+            optionalConvert(size, bigIntToNumber),
+        );
     }
     resolveQuerySet(
         querySet: GpuQuerySet,
@@ -1642,19 +1584,11 @@ export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
         dataOffset: wit.GpuSize64 | undefined,
         dataSize: wit.GpuSize64 | undefined,
     ): void {
-        let dataOffsetWeb: number | undefined;
-        if (typeof dataOffset === "bigint") {
-            dataOffsetWeb = bigIntToNumber(dataOffset);
-        }
-        let dataSizeWeb: number | undefined;
-        if (typeof dataSize === "bigint") {
-            dataSizeWeb = bigIntToNumber(dataSize);
-        }
         this[inner].setImmediates(
             rangeOffset,
             data.buffer,
-            dataOffsetWeb,
-            dataSizeWeb,
+            optionalConvert(dataOffset, bigIntToNumber),
+            optionalConvert(dataSize, bigIntToNumber),
         );
     }
     setPipeline(pipeline: GpuComputePipeline): void {
@@ -1699,28 +1633,21 @@ export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
         dynamicOffsetsDataStart?: wit.GpuSize64,
         dynamicOffsetsDataLength?: wit.GpuSize32,
     ): void {
-        let bindGroupWeb: GPUBindGroup | undefined;
-        if (bindGroup) {
-            bindGroupWeb = bindGroup[inner];
-        }
         if (dynamicOffsetsData === undefined) {
-            return this[inner].setBindGroup(index, bindGroupWeb);
+            return this[inner].setBindGroup(
+                index,
+                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+            );
         } else {
-            let dynamicOffsetsDataStartNumber: number;
-            if (dynamicOffsetsDataStart) {
-                dynamicOffsetsDataStartNumber = bigIntToNumber(
-                    dynamicOffsetsDataStart,
-                );
-            } else {
-                dynamicOffsetsDataStartNumber = 0;
-            }
+            const dynamicOffsetsDataStartNumber =
+                optionalConvert(dynamicOffsetsDataStart, bigIntToNumber) ?? 0;
             if (dynamicOffsetsDataLength === undefined) {
                 dynamicOffsetsDataLength =
                     dynamicOffsetsData.length - dynamicOffsetsDataStartNumber;
             }
             return this[inner].setBindGroup(
                 index,
-                bindGroupWeb,
+                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
                 dynamicOffsetsData,
                 dynamicOffsetsDataStartNumber,
                 dynamicOffsetsDataLength,
@@ -1807,20 +1734,12 @@ export class GpuQueue implements wit.GpuQueue {
         dataOffset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
-        let dataOffsetNumber: number | undefined;
-        if (dataOffset) {
-            dataOffsetNumber = bigIntToNumber(dataOffset);
-        }
-        let sizeNumber: number | undefined;
-        if (size) {
-            sizeNumber = bigIntToNumber(size);
-        }
         return this[inner].writeBuffer(
             buffer[inner],
             bigIntToNumber(bufferOffset),
             data.buffer,
-            dataOffsetNumber,
-            sizeNumber,
+            optionalConvert(dataOffset, bigIntToNumber),
+            optionalConvert(size, bigIntToNumber),
         );
     }
     writeTextureWithCopy(
@@ -1829,10 +1748,6 @@ export class GpuQueue implements wit.GpuQueue {
         dataLayout: wit.GpuTexelCopyBufferLayout,
         size: wit.GpuExtent3D,
     ): void {
-        let offset: number | undefined;
-        if (dataLayout.offset) {
-            offset = bigIntToNumber(dataLayout.offset);
-        }
         return this[inner].writeTexture(
             {
                 ...destination,
@@ -1841,7 +1756,7 @@ export class GpuQueue implements wit.GpuQueue {
             data.buffer,
             {
                 ...dataLayout,
-                offset,
+                offset: optionalConvert(dataLayout.offset, bigIntToNumber),
             },
             size,
         );
@@ -1880,19 +1795,11 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
         dataOffset: wit.GpuSize64 | undefined,
         dataSize: wit.GpuSize64 | undefined,
     ): void {
-        let dataOffsetWeb: number | undefined;
-        if (typeof dataOffset === "bigint") {
-            dataOffsetWeb = bigIntToNumber(dataOffset);
-        }
-        let dataSizeWeb: number | undefined;
-        if (typeof dataSize === "bigint") {
-            dataSizeWeb = bigIntToNumber(dataSize);
-        }
         this[inner].setImmediates(
             rangeOffset,
             data.buffer,
-            dataOffsetWeb,
-            dataSizeWeb,
+            optionalConvert(dataOffset, bigIntToNumber),
+            optionalConvert(dataSize, bigIntToNumber),
         );
     }
     finish(descriptor?: wit.GpuRenderBundleDescriptor): wit.GpuRenderBundle {
@@ -1914,28 +1821,21 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
         dynamicOffsetsDataStart?: wit.GpuSize64,
         dynamicOffsetsDataLength?: wit.GpuSize32,
     ): void {
-        let bindGroupWeb: GPUBindGroup | undefined;
-        if (bindGroup) {
-            bindGroupWeb = bindGroup[inner];
-        }
         if (dynamicOffsetsData === undefined) {
-            return this[inner].setBindGroup(index, bindGroupWeb);
+            return this[inner].setBindGroup(
+                index,
+                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+            );
         } else {
-            let dynamicOffsetsDataStartNumber: number;
-            if (dynamicOffsetsDataStart) {
-                dynamicOffsetsDataStartNumber = bigIntToNumber(
-                    dynamicOffsetsDataStart,
-                );
-            } else {
-                dynamicOffsetsDataStartNumber = 0;
-            }
+            const dynamicOffsetsDataStartNumber =
+                optionalConvert(dynamicOffsetsDataStart, bigIntToNumber) ?? 0;
             if (dynamicOffsetsDataLength === undefined) {
                 dynamicOffsetsDataLength =
                     dynamicOffsetsData.length - dynamicOffsetsDataStartNumber;
             }
             return this[inner].setBindGroup(
                 index,
-                bindGroupWeb,
+                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
                 dynamicOffsetsData,
                 dynamicOffsetsDataStartNumber,
                 dynamicOffsetsDataLength,
@@ -1951,19 +1851,11 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
-        let offsetNumber: number | undefined;
-        if (offset) {
-            offsetNumber = bigIntToNumber(offset);
-        }
-        let sizeNumber: number | undefined;
-        if (size) {
-            sizeNumber = bigIntToNumber(size);
-        }
         return this[inner].setIndexBuffer(
             buffer[inner],
             indexFormat,
-            offsetNumber,
-            sizeNumber,
+            optionalConvert(offset, bigIntToNumber),
+            optionalConvert(size, bigIntToNumber),
         );
     }
     setVertexBuffer(
@@ -1972,23 +1864,11 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
-        let bufferWeb: GPUBuffer | undefined;
-        if (buffer) {
-            bufferWeb = buffer[inner];
-        }
-        let offsetNumber: number | undefined;
-        if (offset) {
-            offsetNumber = bigIntToNumber(offset);
-        }
-        let sizeNumber: number | undefined;
-        if (size) {
-            sizeNumber = bigIntToNumber(size);
-        }
         return this[inner].setVertexBuffer(
             slot,
-            bufferWeb,
-            offsetNumber,
-            sizeNumber,
+            optionalConvert(buffer, (buffer) => buffer[inner]),
+            optionalConvert(offset, bigIntToNumber),
+            optionalConvert(size, bigIntToNumber),
         );
     }
     draw(
@@ -2057,19 +1937,11 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
         dataOffset: wit.GpuSize64 | undefined,
         dataSize: wit.GpuSize64 | undefined,
     ): void {
-        let dataOffsetWeb: number | undefined;
-        if (typeof dataOffset === "bigint") {
-            dataOffsetWeb = bigIntToNumber(dataOffset);
-        }
-        let dataSizeWeb: number | undefined;
-        if (typeof dataSize === "bigint") {
-            dataSizeWeb = bigIntToNumber(dataSize);
-        }
         this[inner].setImmediates(
             rangeOffset,
             data.buffer,
-            dataOffsetWeb,
-            dataSizeWeb,
+            optionalConvert(dataOffset, bigIntToNumber),
+            optionalConvert(dataSize, bigIntToNumber),
         );
     }
     setViewport(
@@ -2126,28 +1998,21 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
         dynamicOffsetsDataStart?: wit.GpuSize64,
         dynamicOffsetsDataLength?: wit.GpuSize32,
     ): void {
-        let bindGroupWeb: GPUBindGroup | undefined;
-        if (bindGroup) {
-            bindGroupWeb = bindGroup[inner];
-        }
         if (dynamicOffsetsData === undefined) {
-            return this[inner].setBindGroup(index, bindGroupWeb);
+            return this[inner].setBindGroup(
+                index,
+                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+            );
         } else {
-            let dynamicOffsetsDataStartNumber: number;
-            if (dynamicOffsetsDataStart) {
-                dynamicOffsetsDataStartNumber = bigIntToNumber(
-                    dynamicOffsetsDataStart,
-                );
-            } else {
-                dynamicOffsetsDataStartNumber = 0;
-            }
+            const dynamicOffsetsDataStartNumber =
+                optionalConvert(dynamicOffsetsDataStart, bigIntToNumber) ?? 0;
             if (dynamicOffsetsDataLength === undefined) {
                 dynamicOffsetsDataLength =
                     dynamicOffsetsData.length - dynamicOffsetsDataStartNumber;
             }
             return this[inner].setBindGroup(
                 index,
-                bindGroupWeb,
+                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
                 dynamicOffsetsData,
                 dynamicOffsetsDataStartNumber,
                 dynamicOffsetsDataLength,
@@ -2163,19 +2028,11 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
-        let offsetNumber: number | undefined;
-        if (offset) {
-            offsetNumber = bigIntToNumber(offset);
-        }
-        let sizeNumber: number | undefined;
-        if (size) {
-            sizeNumber = bigIntToNumber(size);
-        }
         return this[inner].setIndexBuffer(
             buffer[inner],
             indexFormat,
-            offsetNumber,
-            sizeNumber,
+            optionalConvert(offset, bigIntToNumber),
+            optionalConvert(size, bigIntToNumber),
         );
     }
     setVertexBuffer(
@@ -2184,23 +2041,11 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
-        let bufferWeb: GPUBuffer | undefined;
-        if (buffer) {
-            bufferWeb = buffer[inner];
-        }
-        let offsetNumber: number | undefined;
-        if (offset) {
-            offsetNumber = bigIntToNumber(offset);
-        }
-        let sizeNumber: number | undefined;
-        if (size) {
-            sizeNumber = bigIntToNumber(size);
-        }
         return this[inner].setVertexBuffer(
             slot,
-            bufferWeb,
-            offsetNumber,
-            sizeNumber,
+            optionalConvert(buffer, (buffer) => buffer[inner]),
+            optionalConvert(offset, bigIntToNumber),
+            optionalConvert(size, bigIntToNumber),
         );
     }
     draw(
@@ -2461,23 +2306,21 @@ export class GpuTexture implements wit.GpuTexture {
         this[inner].label = label;
     }
     createView(descriptor?: wit.GpuTextureViewDescriptor): wit.GpuTextureView {
-        let format: GPUTextureFormat | undefined;
-        if (descriptor?.format)
-            format = convertTextureFormatWasiToWeb(descriptor.format);
-        let dimension: GPUTextureViewDimension | undefined;
-        if (descriptor?.dimension)
-            dimension = convertTextureViewDimensionWasiToWeb(
-                descriptor.dimension,
-            );
-        let usage: GPUTextureUsageFlags | undefined;
-        if (descriptor?.usage)
-            usage = convertTextureUsageWasiToWeb(descriptor.usage);
         return new GpuTextureView(
             this[inner].createView({
                 ...descriptor,
-                format,
-                dimension,
-                usage,
+                format: optionalConvert(
+                    descriptor?.format,
+                    convertTextureFormatWasiToWeb,
+                ),
+                dimension: optionalConvert(
+                    descriptor?.dimension,
+                    convertTextureViewDimensionWasiToWeb,
+                ),
+                usage: optionalConvert(
+                    descriptor?.usage,
+                    convertTextureUsageWasiToWeb,
+                ),
             }),
         );
     }
