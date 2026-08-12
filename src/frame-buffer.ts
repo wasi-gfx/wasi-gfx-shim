@@ -1,7 +1,7 @@
-import { Todo } from "./common";
+import { Strict, Todo } from "./common";
 import * as wit from "../types/interfaces/wasi-gfx-frame-buffer-frame-buffer";
 
-export class Buffer implements wit.Buffer {
+export class Buffer implements Strict<wit.Buffer> {
     getWithCopy(): Uint8Array {
         throw new Todo();
     }

@@ -1,6 +1,6 @@
 import type { KebabCase } from "type-fest";
 
-import { NotAllowed, Todo, Unreachable } from "./common.js";
+import { NotAllowed, Strict, Todo, Unreachable } from "./common";
 
 import * as wit from "../types/interfaces/wasi-webgpu-webgpu.js";
 import { interfaceKeys, objectKeys } from "./flags-helpers.js";
@@ -688,7 +688,7 @@ function numberToBigInt(number: number): bigint {
 /// This is meant for internal use and is not guaranteed to be stable
 export const inner = Symbol("inner");
 
-export class Gpu implements wit.Gpu {
+export class Gpu implements Strict<wit.Gpu> {
     [inner]: globalThis.GPU;
 
     constructor(i?: globalThis.GPU) {
@@ -715,7 +715,7 @@ export class Gpu implements wit.Gpu {
     }
 }
 
-export class GpuAdapter implements wit.GpuAdapter {
+export class GpuAdapter implements Strict<wit.GpuAdapter> {
     [inner]: globalThis.GPUAdapter;
 
     constructor(i?: globalThis.GPUAdapter) {
@@ -772,7 +772,7 @@ export class GpuAdapter implements wit.GpuAdapter {
     }
 }
 
-export class GpuDevice implements wit.GpuDevice {
+export class GpuDevice implements Strict<wit.GpuDevice> {
     [inner]: globalThis.GPUDevice;
     constructor(i?: globalThis.GPUDevice) {
         if (!i) throw new NotAllowed();
@@ -1163,7 +1163,7 @@ export class GpuDevice implements wit.GpuDevice {
     }
 }
 
-export class GpuAdapterInfo implements wit.GpuAdapterInfo {
+export class GpuAdapterInfo implements Strict<wit.GpuAdapterInfo> {
     [inner]: globalThis.GPUAdapterInfo;
     constructor(i?: globalThis.GPUAdapterInfo) {
         if (!i) throw new NotAllowed();
@@ -1194,7 +1194,7 @@ export class GpuAdapterInfo implements wit.GpuAdapterInfo {
     }
 }
 
-export class GpuBindGroup implements wit.GpuBindGroup {
+export class GpuBindGroup implements Strict<wit.GpuBindGroup> {
     [inner]: globalThis.GPUBindGroup;
     constructor(i?: globalThis.GPUBindGroup) {
         if (!i) throw new NotAllowed();
@@ -1207,7 +1207,7 @@ export class GpuBindGroup implements wit.GpuBindGroup {
         this[inner].label = label;
     }
 }
-export class GpuBindGroupLayout implements wit.GpuBindGroupLayout {
+export class GpuBindGroupLayout implements Strict<wit.GpuBindGroupLayout> {
     [inner]: globalThis.GPUBindGroupLayout;
     constructor(i?: globalThis.GPUBindGroupLayout) {
         if (!i) throw new NotAllowed();
@@ -1220,7 +1220,7 @@ export class GpuBindGroupLayout implements wit.GpuBindGroupLayout {
         this[inner].label = label;
     }
 }
-export class GpuBuffer implements wit.GpuBuffer {
+export class GpuBuffer implements Strict<wit.GpuBuffer> {
     [inner]: globalThis.GPUBuffer;
     #mappedRange: Uint8Array | undefined;
     constructor(i?: globalThis.GPUBuffer) {
@@ -1293,7 +1293,7 @@ export class GpuBuffer implements wit.GpuBuffer {
     }
 }
 
-export class GpuCanvasContext implements wit.GpuCanvasContext {
+export class GpuCanvasContext implements Strict<wit.GpuCanvasContext> {
     configure(configuration: wit.GpuCanvasConfiguration): void {
         throw new Todo();
     }
@@ -1308,7 +1308,7 @@ export class GpuCanvasContext implements wit.GpuCanvasContext {
     }
 }
 
-export class GpuCommandBuffer implements wit.GpuCommandBuffer {
+export class GpuCommandBuffer implements Strict<wit.GpuCommandBuffer> {
     [inner]: globalThis.GPUCommandBuffer;
     constructor(i?: globalThis.GPUCommandBuffer) {
         if (!i) throw new NotAllowed();
@@ -1321,7 +1321,7 @@ export class GpuCommandBuffer implements wit.GpuCommandBuffer {
         this[inner].label = label;
     }
 }
-export class GpuCommandEncoder implements wit.GpuCommandEncoder {
+export class GpuCommandEncoder implements Strict<wit.GpuCommandEncoder> {
     [inner]: GPUCommandEncoder;
     constructor(i?: globalThis.GPUCommandEncoder) {
         if (!i) throw new NotAllowed();
@@ -1410,18 +1410,27 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
         );
     }
     copyBufferToBuffer(
-        source: GpuBuffer,
-        sourceOffset: wit.GpuSize64,
-        destination: GpuBuffer,
-        destinationOffset: wit.GpuSize64,
-        size: wit.GpuSize64,
+        source: wit.GpuBuffer,
+        sourceOffset: wit.GpuSize64 | undefined,
+        destination: wit.GpuBuffer,
+        destinationOffset: wit.GpuSize64 | undefined,
+        size: wit.GpuSize64 | undefined,
     ): void {
+        // https://www.w3.org/TR/webgpu/#gpucommandencoder-copybuffertobuffer
+        // From the spec:
+        // > copyBufferToBuffer(source, destination, size)
+        // >   Shorthand, equivalent to copyBufferToBuffer(source, 0, destination, 0, size).
+        const sourceOffsetWeb =
+            optionalConvert(sourceOffset, bigIntToNumber) ?? 0;
+        const destinationOffsetWeb =
+            optionalConvert(destinationOffset, bigIntToNumber) ?? 0;
+
         this[inner].copyBufferToBuffer(
-            source[inner],
-            bigIntToNumber(sourceOffset),
-            destination[inner],
-            bigIntToNumber(destinationOffset),
-            bigIntToNumber(size),
+            (source as GpuBuffer)[inner],
+            sourceOffsetWeb,
+            (destination as GpuBuffer)[inner],
+            destinationOffsetWeb,
+            optionalConvert(size, bigIntToNumber),
         );
     }
     copyBufferToTexture(
@@ -1478,28 +1487,28 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
         );
     }
     clearBuffer(
-        buffer: GpuBuffer,
+        buffer: wit.GpuBuffer,
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
         this[inner].clearBuffer(
-            buffer[inner],
+            (buffer as GpuBuffer)[inner],
             optionalConvert(offset, bigIntToNumber),
             optionalConvert(size, bigIntToNumber),
         );
     }
     resolveQuerySet(
-        querySet: GpuQuerySet,
+        querySet: wit.GpuQuerySet,
         firstQuery: wit.GpuSize32,
         queryCount: wit.GpuSize32,
-        destination: GpuBuffer,
+        destination: wit.GpuBuffer,
         destinationOffset: wit.GpuSize64,
     ): void {
         return this[inner].resolveQuerySet(
-            querySet[inner],
+            (querySet as GpuQuerySet)[inner],
             firstQuery,
             queryCount,
-            destination[inner],
+            (destination as GpuBuffer)[inner],
             bigIntToNumber(destinationOffset),
         );
     }
@@ -1527,7 +1536,7 @@ export class GpuCommandEncoder implements wit.GpuCommandEncoder {
     }
 }
 
-export class GpuCompilationInfo implements wit.GpuCompilationInfo {
+export class GpuCompilationInfo implements Strict<wit.GpuCompilationInfo> {
     [inner]: globalThis.GPUCompilationInfo;
     constructor(i?: globalThis.GPUCompilationInfo) {
         if (!i) throw new NotAllowed();
@@ -1540,7 +1549,7 @@ export class GpuCompilationInfo implements wit.GpuCompilationInfo {
     }
 }
 
-export class GpuCompilationMessage implements wit.GpuCompilationMessage {
+export class GpuCompilationMessage implements Strict<wit.GpuCompilationMessage> {
     [inner]: globalThis.GPUCompilationMessage;
     constructor(i?: globalThis.GPUCompilationMessage) {
         if (!i) throw new NotAllowed();
@@ -1566,7 +1575,7 @@ export class GpuCompilationMessage implements wit.GpuCompilationMessage {
     }
 }
 
-export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
+export class GpuComputePassEncoder implements Strict<wit.GpuComputePassEncoder> {
     [inner]: globalThis.GPUComputePassEncoder;
     constructor(i?: globalThis.GPUComputePassEncoder) {
         if (!i) throw new NotAllowed();
@@ -1591,8 +1600,8 @@ export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
             optionalConvert(dataSize, bigIntToNumber),
         );
     }
-    setPipeline(pipeline: GpuComputePipeline): void {
-        return this[inner].setPipeline(pipeline[inner]);
+    setPipeline(pipeline: wit.GpuComputePipeline): void {
+        return this[inner].setPipeline((pipeline as GpuComputePipeline)[inner]);
     }
     dispatchWorkgroups(
         workgroupCountX: wit.GpuSize32,
@@ -1606,11 +1615,11 @@ export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
         );
     }
     dispatchWorkgroupsIndirect(
-        indirectBuffer: GpuBuffer,
+        indirectBuffer: wit.GpuBuffer,
         indirectOffset: wit.GpuSize64,
     ): void {
         return this[inner].dispatchWorkgroupsIndirect(
-            indirectBuffer[inner],
+            (indirectBuffer as GpuBuffer)[inner],
             bigIntToNumber(indirectOffset),
         );
     }
@@ -1628,7 +1637,7 @@ export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
     }
     setBindGroup(
         index: wit.GpuIndex32,
-        bindGroup?: GpuBindGroup,
+        bindGroup?: wit.GpuBindGroup,
         dynamicOffsetsData?: Uint32Array,
         dynamicOffsetsDataStart?: wit.GpuSize64,
         dynamicOffsetsDataLength?: wit.GpuSize32,
@@ -1636,7 +1645,10 @@ export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
         if (dynamicOffsetsData === undefined) {
             return this[inner].setBindGroup(
                 index,
-                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+                optionalConvert(
+                    bindGroup,
+                    (bindGroup) => (bindGroup as GpuBindGroup)[inner],
+                ),
             );
         } else {
             const dynamicOffsetsDataStartNumber =
@@ -1647,7 +1659,10 @@ export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
             }
             return this[inner].setBindGroup(
                 index,
-                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+                optionalConvert(
+                    bindGroup,
+                    (bindGroup) => (bindGroup as GpuBindGroup)[inner],
+                ),
                 dynamicOffsetsData,
                 dynamicOffsetsDataStartNumber,
                 dynamicOffsetsDataLength,
@@ -1656,7 +1671,7 @@ export class GpuComputePassEncoder implements wit.GpuComputePassEncoder {
     }
 }
 
-export class GpuComputePipeline implements wit.GpuComputePipeline {
+export class GpuComputePipeline implements Strict<wit.GpuComputePipeline> {
     [inner]: globalThis.GPUComputePipeline;
     constructor(i?: globalThis.GPUComputePipeline) {
         if (!i) throw new NotAllowed();
@@ -1673,7 +1688,7 @@ export class GpuComputePipeline implements wit.GpuComputePipeline {
     }
 }
 
-export class GpuPipelineLayout implements wit.GpuPipelineLayout {
+export class GpuPipelineLayout implements Strict<wit.GpuPipelineLayout> {
     [inner]: globalThis.GPUPipelineLayout;
     constructor(i?: globalThis.GPUPipelineLayout) {
         if (!i) throw new NotAllowed();
@@ -1686,7 +1701,7 @@ export class GpuPipelineLayout implements wit.GpuPipelineLayout {
         this[inner].label = label;
     }
 }
-export class GpuQuerySet implements wit.GpuQuerySet {
+export class GpuQuerySet implements Strict<wit.GpuQuerySet> {
     [inner]: globalThis.GPUQuerySet;
     constructor(i?: globalThis.GPUQuerySet) {
         if (!i) throw new NotAllowed();
@@ -1709,7 +1724,7 @@ export class GpuQuerySet implements wit.GpuQuerySet {
     }
 }
 
-export class GpuQueue implements wit.GpuQueue {
+export class GpuQueue implements Strict<wit.GpuQueue> {
     [inner]: globalThis.GPUQueue;
     constructor(i?: globalThis.GPUQueue) {
         if (!i) throw new NotAllowed();
@@ -1721,21 +1736,23 @@ export class GpuQueue implements wit.GpuQueue {
     setLabel(label: string): void {
         this[inner].label = label;
     }
-    submit(commandBuffers: Array<GpuCommandBuffer>): void {
-        return this[inner].submit(commandBuffers.map((c) => c[inner]));
+    submit(commandBuffers: Array<wit.GpuCommandBuffer>): void {
+        return this[inner].submit(
+            commandBuffers.map((c) => (c as GpuCommandBuffer)[inner]),
+        );
     }
     onSubmittedWorkDone(): Promise<void> {
         throw new Todo();
     }
     writeBufferWithCopy(
-        buffer: GpuBuffer,
+        buffer: wit.GpuBuffer,
         bufferOffset: wit.GpuSize64,
         data: Uint8Array,
         dataOffset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
         return this[inner].writeBuffer(
-            buffer[inner],
+            (buffer as GpuBuffer)[inner],
             bigIntToNumber(bufferOffset),
             data.buffer,
             optionalConvert(dataOffset, bigIntToNumber),
@@ -1763,7 +1780,7 @@ export class GpuQueue implements wit.GpuQueue {
     }
 }
 
-export class GpuRenderBundle implements wit.GpuRenderBundle {
+export class GpuRenderBundle implements Strict<wit.GpuRenderBundle> {
     [inner]: globalThis.GPURenderBundle;
     constructor(i?: globalThis.GPURenderBundle) {
         if (!i) throw new NotAllowed();
@@ -1777,7 +1794,7 @@ export class GpuRenderBundle implements wit.GpuRenderBundle {
     }
 }
 
-export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
+export class GpuRenderBundleEncoder implements Strict<wit.GpuRenderBundleEncoder> {
     [inner]: globalThis.GPURenderBundleEncoder;
     constructor(i?: globalThis.GPURenderBundleEncoder) {
         if (!i) throw new NotAllowed();
@@ -1816,7 +1833,7 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
     }
     setBindGroup(
         index: wit.GpuIndex32,
-        bindGroup?: GpuBindGroup,
+        bindGroup?: wit.GpuBindGroup,
         dynamicOffsetsData?: Uint32Array,
         dynamicOffsetsDataStart?: wit.GpuSize64,
         dynamicOffsetsDataLength?: wit.GpuSize32,
@@ -1824,7 +1841,10 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
         if (dynamicOffsetsData === undefined) {
             return this[inner].setBindGroup(
                 index,
-                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+                optionalConvert(
+                    bindGroup,
+                    (bindGroup) => (bindGroup as GpuBindGroup)[inner],
+                ),
             );
         } else {
             const dynamicOffsetsDataStartNumber =
@@ -1835,24 +1855,27 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
             }
             return this[inner].setBindGroup(
                 index,
-                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+                optionalConvert(
+                    bindGroup,
+                    (bindGroup) => (bindGroup as GpuBindGroup)[inner],
+                ),
                 dynamicOffsetsData,
                 dynamicOffsetsDataStartNumber,
                 dynamicOffsetsDataLength,
             );
         }
     }
-    setPipeline(pipeline: GpuRenderPipeline): void {
-        return this[inner].setPipeline(pipeline[inner]);
+    setPipeline(pipeline: wit.GpuRenderPipeline): void {
+        return this[inner].setPipeline((pipeline as GpuRenderPipeline)[inner]);
     }
     setIndexBuffer(
-        buffer: GpuBuffer,
+        buffer: wit.GpuBuffer,
         indexFormat: wit.GpuIndexFormat,
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
         return this[inner].setIndexBuffer(
-            buffer[inner],
+            (buffer as GpuBuffer)[inner],
             indexFormat,
             optionalConvert(offset, bigIntToNumber),
             optionalConvert(size, bigIntToNumber),
@@ -1860,13 +1883,13 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
     }
     setVertexBuffer(
         slot: wit.GpuIndex32,
-        buffer?: GpuBuffer,
+        buffer?: wit.GpuBuffer,
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
         return this[inner].setVertexBuffer(
             slot,
-            optionalConvert(buffer, (buffer) => buffer[inner]),
+            optionalConvert(buffer, (buffer) => (buffer as GpuBuffer)[inner]),
             optionalConvert(offset, bigIntToNumber),
             optionalConvert(size, bigIntToNumber),
         );
@@ -1900,26 +1923,26 @@ export class GpuRenderBundleEncoder implements wit.GpuRenderBundleEncoder {
         );
     }
     drawIndirect(
-        indirectBuffer: GpuBuffer,
+        indirectBuffer: wit.GpuBuffer,
         indirectOffset: wit.GpuSize64,
     ): void {
         return this[inner].drawIndirect(
-            indirectBuffer[inner],
+            (indirectBuffer as GpuBuffer)[inner],
             bigIntToNumber(indirectOffset),
         );
     }
     drawIndexedIndirect(
-        indirectBuffer: GpuBuffer,
+        indirectBuffer: wit.GpuBuffer,
         indirectOffset: wit.GpuSize64,
     ): void {
         return this[inner].drawIndexedIndirect(
-            indirectBuffer[inner],
+            (indirectBuffer as GpuBuffer)[inner],
             bigIntToNumber(indirectOffset),
         );
     }
 }
 
-export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
+export class GpuRenderPassEncoder implements Strict<wit.GpuRenderPassEncoder> {
     [inner]: globalThis.GPURenderPassEncoder;
     constructor(i?: globalThis.GPURenderPassEncoder) {
         if (!i) throw new NotAllowed();
@@ -1974,9 +1997,9 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
     endOcclusionQuery(): void {
         return this[inner].endOcclusionQuery();
     }
-    executeBundles(bundles: Array<GpuRenderBundle>): void {
+    executeBundles(bundles: Array<wit.GpuRenderBundle>): void {
         return this[inner].executeBundles(
-            bundles.map((bundle) => bundle[inner]),
+            bundles.map((bundle) => (bundle as GpuRenderBundle)[inner]),
         );
     }
     end(): void {
@@ -1993,7 +2016,7 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
     }
     setBindGroup(
         index: wit.GpuIndex32,
-        bindGroup?: GpuBindGroup,
+        bindGroup?: wit.GpuBindGroup,
         dynamicOffsetsData?: Uint32Array,
         dynamicOffsetsDataStart?: wit.GpuSize64,
         dynamicOffsetsDataLength?: wit.GpuSize32,
@@ -2001,7 +2024,10 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
         if (dynamicOffsetsData === undefined) {
             return this[inner].setBindGroup(
                 index,
-                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+                optionalConvert(
+                    bindGroup,
+                    (bindGroup) => (bindGroup as GpuBindGroup)[inner],
+                ),
             );
         } else {
             const dynamicOffsetsDataStartNumber =
@@ -2012,24 +2038,27 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
             }
             return this[inner].setBindGroup(
                 index,
-                optionalConvert(bindGroup, (bindGroup) => bindGroup[inner]),
+                optionalConvert(
+                    bindGroup,
+                    (bindGroup) => (bindGroup as GpuBindGroup)[inner],
+                ),
                 dynamicOffsetsData,
                 dynamicOffsetsDataStartNumber,
                 dynamicOffsetsDataLength,
             );
         }
     }
-    setPipeline(pipeline: GpuRenderPipeline): void {
-        return this[inner].setPipeline(pipeline[inner]);
+    setPipeline(pipeline: wit.GpuRenderPipeline): void {
+        return this[inner].setPipeline((pipeline as GpuRenderPipeline)[inner]);
     }
     setIndexBuffer(
-        buffer: GpuBuffer,
+        buffer: wit.GpuBuffer,
         indexFormat: wit.GpuIndexFormat,
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
         return this[inner].setIndexBuffer(
-            buffer[inner],
+            (buffer as GpuBuffer)[inner],
             indexFormat,
             optionalConvert(offset, bigIntToNumber),
             optionalConvert(size, bigIntToNumber),
@@ -2037,13 +2066,13 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
     }
     setVertexBuffer(
         slot: wit.GpuIndex32,
-        buffer?: GpuBuffer,
+        buffer?: wit.GpuBuffer,
         offset?: wit.GpuSize64,
         size?: wit.GpuSize64,
     ): void {
         return this[inner].setVertexBuffer(
             slot,
-            optionalConvert(buffer, (buffer) => buffer[inner]),
+            optionalConvert(buffer, (buffer) => (buffer as GpuBuffer)[inner]),
             optionalConvert(offset, bigIntToNumber),
             optionalConvert(size, bigIntToNumber),
         );
@@ -2077,26 +2106,26 @@ export class GpuRenderPassEncoder implements wit.GpuRenderPassEncoder {
         );
     }
     drawIndirect(
-        indirectBuffer: GpuBuffer,
+        indirectBuffer: wit.GpuBuffer,
         indirectOffset: wit.GpuSize64,
     ): void {
         return this[inner].drawIndirect(
-            indirectBuffer[inner],
+            (indirectBuffer as GpuBuffer)[inner],
             bigIntToNumber(indirectOffset),
         );
     }
     drawIndexedIndirect(
-        indirectBuffer: GpuBuffer,
+        indirectBuffer: wit.GpuBuffer,
         indirectOffset: wit.GpuSize64,
     ): void {
         return this[inner].drawIndexedIndirect(
-            indirectBuffer[inner],
+            (indirectBuffer as GpuBuffer)[inner],
             bigIntToNumber(indirectOffset),
         );
     }
 }
 
-export class GpuRenderPipeline implements wit.GpuRenderPipeline {
+export class GpuRenderPipeline implements Strict<wit.GpuRenderPipeline> {
     [inner]: globalThis.GPURenderPipeline;
     constructor(i?: globalThis.GPURenderPipeline) {
         if (!i) throw new NotAllowed();
@@ -2113,7 +2142,7 @@ export class GpuRenderPipeline implements wit.GpuRenderPipeline {
     }
 }
 
-export class GpuSampler implements wit.GpuSampler {
+export class GpuSampler implements Strict<wit.GpuSampler> {
     [inner]: globalThis.GPUSampler;
     constructor(i?: globalThis.GPUSampler) {
         if (!i) throw new NotAllowed();
@@ -2127,7 +2156,7 @@ export class GpuSampler implements wit.GpuSampler {
     }
 }
 
-export class GpuShaderModule implements wit.GpuShaderModule {
+export class GpuShaderModule implements Strict<wit.GpuShaderModule> {
     [inner]: globalThis.GPUShaderModule;
     constructor(i?: globalThis.GPUShaderModule) {
         if (!i) throw new NotAllowed();
@@ -2144,7 +2173,7 @@ export class GpuShaderModule implements wit.GpuShaderModule {
     }
 }
 
-export class GpuSupportedFeatures implements wit.GpuSupportedFeatures {
+export class GpuSupportedFeatures implements Strict<wit.GpuSupportedFeatures> {
     [inner]: globalThis.GPUSupportedFeatures;
     constructor(i?: globalThis.GPUSupportedFeatures) {
         if (!i) throw new NotAllowed();
@@ -2173,7 +2202,7 @@ type WasiSupportedLimitString =
     | "max-texture-dimension2-d"
     | "max-texture-dimension3-d";
 
-export class GpuSupportedLimits implements wit.GpuSupportedLimits {
+export class GpuSupportedLimits implements Strict<wit.GpuSupportedLimits> {
     [inner]: globalThis.GPUSupportedLimits;
     constructor(i?: globalThis.GPUSupportedLimits) {
         if (!i) throw new NotAllowed();
@@ -2293,7 +2322,7 @@ export class GpuSupportedLimits implements wit.GpuSupportedLimits {
     }
 }
 
-export class GpuTexture implements wit.GpuTexture {
+export class GpuTexture implements Strict<wit.GpuTexture> {
     [inner]: globalThis.GPUTexture;
     constructor(i?: globalThis.GPUTexture) {
         if (!i) throw new NotAllowed();
@@ -2363,7 +2392,7 @@ export class GpuTexture implements wit.GpuTexture {
     }
 }
 
-export class GpuTextureView implements wit.GpuTextureView {
+export class GpuTextureView implements Strict<wit.GpuTextureView> {
     [inner]: globalThis.GPUTextureView;
     constructor(i?: globalThis.GPUTextureView) {
         if (!i) throw new NotAllowed();
@@ -2377,7 +2406,7 @@ export class GpuTextureView implements wit.GpuTextureView {
     }
 }
 
-export class GpuUncapturedErrorEvent implements wit.GpuUncapturedErrorEvent {
+export class GpuUncapturedErrorEvent implements Strict<wit.GpuUncapturedErrorEvent> {
     [inner]: globalThis.GPUUncapturedErrorEvent;
     constructor(i?: globalThis.GPUUncapturedErrorEvent) {
         if (!i) throw new NotAllowed();
@@ -2388,9 +2417,7 @@ export class GpuUncapturedErrorEvent implements wit.GpuUncapturedErrorEvent {
     }
 }
 
-export class RecordGpuPipelineConstantValue
-    implements wit.RecordGpuPipelineConstantValue
-{
+export class RecordGpuPipelineConstantValue implements Strict<wit.RecordGpuPipelineConstantValue> {
     private map: Map<string, wit.GpuPipelineConstantValue> = new Map();
     add(key: string, value: wit.GpuPipelineConstantValue): void {
         this.map.set(key, value);
@@ -2415,7 +2442,7 @@ export class RecordGpuPipelineConstantValue
     }
 }
 
-export class RecordOptionGpuSize64 implements wit.RecordOptionGpuSize64 {
+export class RecordOptionGpuSize64 implements Strict<wit.RecordOptionGpuSize64> {
     private map: Map<string, wit.GpuSize64 | undefined> = new Map();
     add(key: string, value: wit.GpuSize64 | undefined): void {
         this.map.set(key, value);
@@ -2449,7 +2476,7 @@ export class RecordOptionGpuSize64 implements wit.RecordOptionGpuSize64 {
     }
 }
 
-export class WgslLanguageFeatures implements wit.WgslLanguageFeatures {
+export class WgslLanguageFeatures implements Strict<wit.WgslLanguageFeatures> {
     [inner]: globalThis.WGSLLanguageFeatures;
     constructor(i?: globalThis.WGSLLanguageFeatures) {
         if (!i) throw new NotAllowed();
@@ -2460,7 +2487,7 @@ export class WgslLanguageFeatures implements wit.WgslLanguageFeatures {
     }
 }
 
-export class GpuDeviceLostInfo implements wit.GpuDeviceLostInfo {
+export class GpuDeviceLostInfo implements Strict<wit.GpuDeviceLostInfo> {
     [inner]: globalThis.GPUDeviceLostInfo;
     constructor(i?: globalThis.GPUDeviceLostInfo) {
         if (!i) throw new NotAllowed();
@@ -2474,7 +2501,7 @@ export class GpuDeviceLostInfo implements wit.GpuDeviceLostInfo {
     }
 }
 
-export class GpuError implements wit.GpuError {
+export class GpuError implements Strict<wit.GpuError> {
     [inner]: globalThis.GPUError;
     constructor(i?: globalThis.GPUError) {
         if (!i) throw new NotAllowed();

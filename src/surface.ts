@@ -1,4 +1,4 @@
-import { Todo } from "./common.js";
+import { Strict, Todo } from "./common";
 import * as wit from "../types/interfaces/wasi-gfx-surface-surface";
 
 function keyWebToWasi(key: string): wit.Key | undefined {
@@ -349,7 +349,7 @@ function keyWebToWasi(key: string): wit.Key | undefined {
     }
 }
 
-export class Surface implements wit.Surface {
+export class Surface implements Strict<wit.Surface> {
     canvas: HTMLCanvasElement;
 
     constructor(desc: wit.CreateDesc) {

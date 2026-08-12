@@ -1,5 +1,5 @@
 import * as wit from "../types/interfaces/wasi-gfx-surface-surface-webgpu";
-import { Todo, Unimplemented } from "./common";
+import { Strict, Todo, Unimplemented } from "./common";
 import { Surface } from "./surface";
 import {
     inner,
@@ -11,7 +11,7 @@ import {
 export * from "./surface";
 export * from "./webgpu";
 
-export class Context implements wit.Context {
+export class Context implements Strict<wit.Context> {
     #context: GPUCanvasContext;
     constructor(surface: Surface) {
         const context = surface.canvas.getContext("webgpu");

@@ -1,9 +1,9 @@
 import * as wit from "../types/interfaces/wasi-gfx-surface-surface-frame-buffer";
-import { Todo } from "./common";
+import { Strict, Todo } from "./common";
 export * from "./surface";
 export * from "./frame-buffer";
 
-export class Context implements wit.Context {
+export class Context implements Strict<wit.Context> {
     getCurrentBuffer(): wit.Buffer {
         throw new Todo();
     }
