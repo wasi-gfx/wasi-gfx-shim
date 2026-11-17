@@ -100,7 +100,8 @@ export function convertFeatureNameWasiToWeb(
 ): GPUFeatureName {
     if (name === "texture-compression-bc-sliced3d")
         return "texture-compression-bc-sliced-3d";
-    if (name === "texture-compression-astc-sliced3d") throw new Todo();
+    if (name === "texture-compression-astc-sliced3d")
+        return "texture-compression-astc-sliced-3d";
     return name;
 }
 
@@ -1145,7 +1146,7 @@ export class GpuDevice implements Strict<wit.GpuDevice> {
         );
     }
     lost(): Promise<wit.GpuDeviceLostInfo> {
-        throw new Todo();
+        return this[inner].lost.then((info) => new GpuDeviceLostInfo(info));
     }
     pushErrorScope(filter: wit.GpuErrorFilter): void {
         return this[inner].pushErrorScope(filter);
@@ -1742,7 +1743,7 @@ export class GpuQueue implements Strict<wit.GpuQueue> {
         );
     }
     onSubmittedWorkDone(): Promise<void> {
-        throw new Todo();
+        return this[inner].onSubmittedWorkDone();
     }
     writeBufferWithCopy(
         buffer: wit.GpuBuffer,
@@ -2180,7 +2181,9 @@ export class GpuSupportedFeatures implements Strict<wit.GpuSupportedFeatures> {
         this[inner] = i;
     }
     has(value: string): boolean {
-        return this[inner].has(value);
+        return this[inner].has(
+            convertFeatureNameWasiToWeb(value as wit.GpuFeatureName),
+        );
     }
 }
 
